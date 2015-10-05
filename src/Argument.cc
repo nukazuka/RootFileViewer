@@ -365,7 +365,7 @@ void Argument::Option()
        << "=== drawing setting " << GetRepeatedWords("=", length-20 ) << endl;
 
   cout << "|" << setw( indent ) << " --ratio : " 
-       << "Rarios of histogram (hist[i]/hist[0]) are drawn" << endl;
+       << "Ratios of histogram (hist[i]/hist[0]) are drawn" << endl;
   cout << "|" << setw( indent ) << " --both : " 
        << "Both of normal histograms and rarios of histograms are drawn" << endl;
   cout << "|" << setw( indent ) << " --cut : "
