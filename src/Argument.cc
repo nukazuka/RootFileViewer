@@ -71,7 +71,7 @@ void Argument::Init()
   ExtractCut();
 
   // make a vector of FileManager
-  for( int i=0; i<vfile_.size(); i++ )
+  for( unsigned int i=0; i<vfile_.size(); i++ )
     {
 
       FileManager* fm = new FileManager( vfile_[i] );

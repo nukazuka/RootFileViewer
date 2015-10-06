@@ -89,7 +89,7 @@ TTree* FileManager::GetTree( int tree_id )
 
   TTree* tr = new TTree();
 
-  if( tree_id < 0 || tree_id >= vtr_.size() )
+  if( tree_id < 0 || tree_id >= (int)vtr_.size() )
     {
       cerr << "TTree* FileManager::GetTree( int tree_id )" << endl;
       cerr << "tree_id is " << tree_id << " ." << endl;
