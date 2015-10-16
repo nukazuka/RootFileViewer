@@ -22,7 +22,7 @@ $(TARGET): $(OBJECTS)
 	$(COMPILER) -o $@ $^ $(LDFLAGS) $(LIBS)
 
 %.o: %.cc
-	$(COMPILER) $(CFLAGS) $(INCLUDE) -o $@ -c $<
+	$(COMPILER) $(CFLAGS) $(INCLUDE) -o $@ -c $< $(LIBS)
 
 all: clean $(TARGET)
 

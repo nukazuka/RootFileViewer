@@ -74,7 +74,7 @@ void Argument::Init()
 
   cout << "before FileManager loop" << endl;
   // make a vector of FileManager
-  for( int i=0; i<vfile_.size(); i++ )
+  for( unsigned int i=0; i<vfile_.size(); i++ )
     {
 
       cout << i << " th loop" << endl;
