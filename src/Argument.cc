@@ -10,9 +10,7 @@ Argument::Argument(int argc, char* argv[] )
   if( parser_->IsSpecified( "option" ) )
     Option();
 
-  cout << "before Init()" << endl;
   Init();
-  cout << "after Init()" << endl;
   if( vfile_.size() == 0 )
     {
       cerr << "No data file " << endl;
@@ -72,16 +70,13 @@ void Argument::Init()
 
   ExtractCut();
 
-  cout << "before FileManager loop" << endl;
   // make a vector of FileManager
   for( unsigned int i=0; i<vfile_.size(); i++ )
     {
 
-      cout << i << " th loop" << endl;
       FileManager* fm = new FileManager( vfile_[i] );
       vfm_.push_back( fm );
     }
-  cout << "after FileManager loop" << endl;
 
   IsTree() ? ExtractTreeID() : AskTreeID();
 

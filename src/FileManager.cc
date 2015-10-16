@@ -7,7 +7,6 @@ FileManager::FileManager( string file_full_path_arg )
 {
 
   file_full_path_ =   file_full_path_arg;
-  cout << "FileManager::  constructer" << endl;
   Init();
 
 }
@@ -33,14 +32,12 @@ void FileManager::Init()
   
   if( file_suffix_ != ".root" )
     {
-      cout << "It's not Root file" << endl;
+      cerr << "It's not Root file" << endl;
       Init_NotRootFile();
       return;
     }
 
   ExtractAllTree();
-  cout << "after ExtrackAllTree()" << endl;
-
 }
 
 void FileManager::Init_NotRootFile()
@@ -56,12 +53,22 @@ void FileManager::ExtractAllTree()
     {
 
       string key_name = tf_->GetListOfKeys()->At(i)->GetName();
-      bool bl_folder = tf_->GetListOfKeys()->At(i)->IsFolder();
+      string class_name = tf_->Get( key_name.c_str() )->ClassName();
 
-      cout << key_name << "\tfolder:" << bl_folder << endl;
+      bool bl_folder = false;
+      if( class_name == "TDirectoryFile" )
+	bl_folder = tf_->GetListOfKeys()->At(i)->IsFolder();
+
+      cout << key_name << "\tclass:" << class_name << "\tfolder:" << bl_folder << endl;
       structure_ += key_name + "/";
 
-      if( bl_folder )
+      // In case of TTree
+      if( class_name == "TTree" )
+	{
+	  vtr_.push_back( (TTree*)tf_->Get( key_name.c_str() ) );
+	}
+      // In case of TDirectoryFile
+      else if( bl_folder )
 	{
 	  TDirectoryFile* tdf = (TDirectoryFile*)tf_->Get( key_name.c_str() );
 
@@ -71,7 +78,7 @@ void FileManager::ExtractAllTree()
 	      string key_name2 = tdf->GetListOfKeys()->At(j)->GetName();
 	      string class_name2 = tdf->Get( key_name2.c_str() )->ClassName();
 
-	      cout << "\t" << key_name2 << "\t" << class_name2 << endl;
+	      cout << "  |- " << class_name2 << "\t" << key_name2 << endl;
 	      structure_ += key_name2 + ":";
 	      if( class_name2 == "TTree" )
 		vtr_.push_back( (TTree*)tdf->Get( key_name2.c_str() ) );
