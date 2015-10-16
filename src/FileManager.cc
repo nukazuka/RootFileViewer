@@ -7,7 +7,7 @@ FileManager::FileManager( string file_full_path_arg )
 {
 
   file_full_path_ =   file_full_path_arg;
-  //  cout << "FileManager::  constructer" << endl;
+  cout << "FileManager::  constructer" << endl;
   Init();
 
 }
@@ -39,6 +39,7 @@ void FileManager::Init()
     }
 
   ExtractAllTree();
+  cout << "after ExtrackAllTree()" << endl;
 
 }
 
@@ -57,7 +58,9 @@ void FileManager::ExtractAllTree()
       string key_name = tf_->GetListOfKeys()->At(i)->GetName();
       bool bl_folder = tf_->GetListOfKeys()->At(i)->IsFolder();
 
+      cout << key_name << "\tfolder:" << bl_folder << endl;
       structure_ += key_name + "/";
+
       if( bl_folder )
 	{
 	  TDirectoryFile* tdf = (TDirectoryFile*)tf_->Get( key_name.c_str() );
@@ -68,6 +71,7 @@ void FileManager::ExtractAllTree()
 	      string key_name2 = tdf->GetListOfKeys()->At(j)->GetName();
 	      string class_name2 = tdf->Get( key_name2.c_str() )->ClassName();
 
+	      cout << "\t" << key_name2 << "\t" << class_name2 << endl;
 	      structure_ += key_name2 + ":";
 	      if( class_name2 == "TTree" )
 		vtr_.push_back( (TTree*)tdf->Get( key_name2.c_str() ) );
