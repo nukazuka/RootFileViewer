@@ -185,9 +185,11 @@ void Argument::ExtractTreeID()
 string Argument::ExtractSaveName()
 {
 
+  // for test mode
   if( bl_test_ )
     return "test.pdf";
 
+  // set directory where output file is put
   string dir = "";
   if( bl_out_dir_ )
     dir = parser_->GetArgument( "out-dir" );
@@ -196,14 +198,17 @@ string Argument::ExtractSaveName()
     if( dir.substr( dir.size()-1, 1 ) != "/" )
       dir += "/";
 
+  // get a basename of file
   string file_info = "" ;
   for( unsigned int i=0; i<vfm_.size(); i++ )
     file_info += GetBaseName( vfm_[i]->GetName() ) + "-";
 
   file_info = file_info.substr( 0,file_info.size()-1 );
 
+  // get a name of object
   string tree_info = (vfm_[0]->GetTree( tree_id_ ))->GetName();
 
+  // B: both, R: ratio, N: normal mode
   string setting_info = "";
   if( bl_both_ )
     setting_info = "B";
@@ -212,24 +217,30 @@ string Argument::ExtractSaveName()
   else
     setting_info = "N";
 
+  // if normalized mdoe, add value 
   if( bl_norm_ )
     setting_info += "norm" + Double2String( norm_val_ );
 
+  // log infomation 
   if( bl_logx_ && bl_logy_ )
     setting_info += "logxy";
   else if( bl_logx_ )
     setting_info += "logx";
   else if( bl_logy_ )
     setting_info += "logy";
-      
+
+  // cut infomation       
   string cut_info = "";
   if( bl_cut_ )
     cut_info = cut_;
 
+  // special infomation
   if( bl_s_cut_DY2014_ )
     cut_info = "DY2014" + cut_info;
 
+  // replace spacial charactors
   cut_info = Replace4Cut( cut_info );
+
   string rtn = "" ;
   if( cut_info != "" )
     rtn = dir
