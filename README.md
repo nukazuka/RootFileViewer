@@ -49,3 +49,13 @@ Only TTree are supported at this moment.
  option  |  A list of options are drawn. |
 
 
+
+## 今後の予定
+
+- TTree 以外のオブジェクト（ヒストグラム，グラフ）も書けるようにする
+- 出力オプションに ROOT ファイルを用意する
+- draw する対象に，すべて（ツリー，ヒスト，グラフ）を追加する
+- 設定ファイルを使えるようにする
+    - データ，draw する対象，カット等を記録する
+	- 設定ファイルを読み込み，同じように動作させる
+

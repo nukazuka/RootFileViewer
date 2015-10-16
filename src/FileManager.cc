@@ -85,11 +85,7 @@ void FileManager::ExtractAllTree()
 
 	    }
 	}
-
     }
-
-
-
 }
 
 
