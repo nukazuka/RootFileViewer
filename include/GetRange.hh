@@ -21,6 +21,8 @@ double GetMax( TH1D* hist )
 #include "TH1.h"
 #include "TPad.h"
 
+#include "MyLibrary.hh"
+
 using namespace std;
 
 // vector < TTree* > and vector < string > vcut version, most flexible

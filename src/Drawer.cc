@@ -61,48 +61,28 @@ void Drawer::Draw()
 	{
 	  c_->Divide( 2, 1 );
 
-	  cout << "Double mode" << endl;
 	  DrawPad( c_->cd(1), vhist, vbranch_name_[i],  false );
 	  DrawPad( c_->cd(2), vhist, vbranch_name_[i],  true );
 	}
       else if( arg_->IsRatio() )
 	{
-	  cout << "Ratio mode" << endl;
 	  DrawPad( c_->cd(1), vhist, vbranch_name_[i],  true );
 	}
       else
 	{
-	  cout << "Normal mode" << endl;
 	  DrawPad( c_->cd(1), vhist, vbranch_name_[i],  false );
 	}
 
-      //      vhist.erase( vhist.begin(), vhist.end() );
-      // for( unsigned int j=0; j<vhist.size(); j++ )
-      // 	{
-      // 	  //	  cout << j << endl;
-      // 	  delete vhist[j];
-      // 	}
-
-
-      //vector < TH1D* >().swap( vhist );
-
-      // for( unsigned int j=0; j<vhist.size(); j++ )
-      // 	{
-      // 	  TObject* old = gROOT->FindObject( vhist[j]->GetName() );
-
-      // 	  if(old)
-      // 	  delete old;
-      // 	}
-
       string page_title = "Title: " + Replace( vbranch_name_[i], "tex", "txe" );
       c_->Print( save_.c_str(), page_title.c_str() );
+
+      if(0)
+	if( vbranch_name_[i] == "Hit_FI01X1__" )
+	  c_->WaitPrimitive();
+
       c_->Clear();
 
     }
-  
-
-
-
 }
 
 void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_name, bool ratio )
@@ -117,7 +97,8 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
       gPad->SetLogy( arg_->IsLogy() );
 
       string option = arg_->GetDrawOption();
-      for( unsigned int i=0; i<vtr_.size(); i++ )
+      //      for( unsigned int i=0; i<vtr_.size(); i++ )
+      for( unsigned int i=vtr_.size()-1; i<vtr_.size(); i-- )
 	{
 
 	  if( i==1 )
@@ -158,13 +139,13 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
 
 	  htemp[i]->SetLineWidth( 1 );
 	  htemp[i]->SetMarkerStyle(7);
+
 	  htemp[i]->Divide( htemp[0] );
 
 	  htemp[i]->Draw( option.c_str() );
 	  option += "SAMES";
 	  DrawStats( htemp[i], 0.85, 0.8 - 0.1*(i-1), 1.0, 0.9 - 0.1*(i-1) );
 	}
-
     }
 
   DrawTitle( gPad, 0.07 );
@@ -187,6 +168,9 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
   if( branch_name.find("Hit_DC") != string::npos )
     bin = bin/2;
 
+  cout << branch_name << "\t" << xmin << "\t" << xmax << endl;
+
+
   for( unsigned int i=0; i<vtr_.size(); i++ )
     {
 
@@ -205,23 +189,12 @@ TH1D* Drawer::GetHist( int num, string file_name, TTree* tr, string branch_name,
 
   string name = GetBaseName(file_name);
   string title = branch_name;
-  //  TH1D* hist = new TH1D( name.c_str(), title.c_str(), bin, xmax, xmin );
-
-  //  cout << "GetHist, " << file_name << "\t" << name << "\t" << hist->GetNbinsX() << endl;
-  /*
-  stringstream ss, ss_title;
-  ss << branch_name << ">>" << name;
-
-  cout << ss.str() << endl;
-  tr->Draw( ss.str().c_str(), cut.c_str(), "goff" );
-  cout << "GetHist, " << file_name << "\t" << hist->GetNbinsX() << endl;
-  */
 
   stringstream ss, ss_title;
-  ss << branch_name << ">>temp" 
+  ss << branch_name << ">>htemp" 
      << "(" 
-     << bin << "," 
-     << xmin << "," 
+     << bin << ", " 
+     << xmin << ", " 
      << xmax << ")";
 
   int entry = tr->Draw( ss.str().c_str(), cut.c_str(), "goff" );
@@ -245,7 +218,8 @@ TH1D* Drawer::GetHist( int num, string file_name, TTree* tr, string branch_name,
       exit(-1);
     }
 
-  TH1D* hist = (TH1D*)gDirectory->Get( "temp" );
+  TH1D* hist = (TH1D*)gDirectory->Get( "htemp" );
+
   hist->SetName( name.c_str() );
   hist->SetTitle( title.c_str() );
 

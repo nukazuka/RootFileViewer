@@ -24,27 +24,42 @@ void GetRange
 {
   
   const int num = tr.size();
-  vector < double > min_temp, max_temp;
+  vector < double > vmin_temp, vmax_temp;
 
   TH1D* hist[num];
-  
+
   for( int i=0; i<num; i++)
     {
-
+    
       tr[i]->Draw( branch_name.c_str(), vcut[i].c_str(), "" );
-      hist[i] = (TH1D*)(gPad->GetPrimitive( "htemp" ))->Clone( "hist" );
+      string hist_name = "hist" + Int2String(i);
+      hist[i] = (TH1D*)(gPad->GetPrimitive( "htemp" ))->Clone( hist_name.c_str() );
+      
+      double max_temp = GetMaxOrMin( hist[i], "max" );
+      double min_temp = GetMaxOrMin( hist[i], "min" );
 
-      min_temp.push_back( GetMaxOrMin( hist[i], "min"  ) );
-      max_temp.push_back( GetMaxOrMin( hist[i], "max" ) );
+      if( (double)hist[i]->GetBinWidth(0) > (max_temp - min_temp)/4 )
+	{
+
+	  vmax_temp.push_back( max_temp + hist[i]->GetBinWidth(0) );
+	  vmin_temp.push_back( min_temp + hist[i]->GetBinWidth(0) );
+	}
+      else
+	{
+
+	  vmax_temp.push_back( max_temp );
+	  vmin_temp.push_back( min_temp );
+
+	}
     }
-  
 
   if( min < -1.5 )
-    min = floor( *min_element( min_temp.begin(), min_temp.end() ) );
+    min = floor( *min_element( vmin_temp.begin(), vmin_temp.end() ) );
   else 
-    min = *min_element( min_temp.begin(), min_temp.end() );
+    min = *min_element( vmin_temp.begin(), vmin_temp.end() );
 
-  max = ceil( *max_element( max_temp.begin(), max_temp.end() ) ) + 1 ; // +1 is needed due to a problem of binning for histogram obtained from TTree. (I cannot control number of bin)
+  // ceil: Rounds x upward, returning the smallest integral value that is not less than x.
+  max = ceil( *max_element( vmax_temp.begin(), vmax_temp.end() ) ) ;
 
   gPad->Clear();
 }
@@ -76,7 +91,6 @@ void GetRange( TTree* tr1, TTree* tr2, string branch_name, vector < string >& vc
   vtree.push_back( tr1 );
   vtree.push_back( tr2 );
   
-  cout << branch_name << endl;
   GetRange( vtree, branch_name, vcut, min, max );  
 }
 
@@ -103,7 +117,7 @@ double GetMaxOrMin( TH1D* hist, string mode )
     {
 
       while( hist->GetBinContent( counter ) == 0.0 )
-	counter++;
+	counter++;    
     }
   else if( mode == "max" )
     {
@@ -114,6 +128,7 @@ double GetMaxOrMin( TH1D* hist, string mode )
 
   // back to 1 step before
   counter--;      
+
   (mode == "min") ? bin_index = counter : bin_index = kBin - counter ;
 
   double center = hist->GetXaxis()->GetBinCenter( bin_index );
