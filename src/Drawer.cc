@@ -10,6 +10,7 @@ Drawer::Drawer( Argument* arg )
   Init();
 
   c_->Print( (save_+"[").c_str() );
+  DrawInfo();
   Draw();
   c_->Print( (save_+"]").c_str() );
 
@@ -40,6 +41,68 @@ void Drawer::Init()
   else
     branch_num_ = vbranch_name_.size();
 }
+
+void Drawer::DrawInfo()
+{
+
+  TLatex* tex = new TLatex();
+  double position = 0;
+
+  // file
+  tex->SetTextSizePixels( 36 );
+  tex->DrawLatexNDC( 0.0 , 0.95 , "Data Files:" );
+  position += tex->GetTextSize() * 1.2;
+  tex->SetTextSizePixels( 28 );
+  position += tex->GetTextSize() * 1.05;
+
+  for( int i=0; i < arg_->GetFileNum(); i++ )
+    {
+
+      unsigned int  x, y;
+      tex->GetBoundingBox( x , y , false );
+      cout << x << "\t" << y << endl;
+      tex->SetTextColor( kColor_[i] );
+      //      tex->DrawLatexNDC( 0.05 , 0.9 - 0.1*i , arg_->GetFileName(i).c_str() );
+      //      tex->DrawLatex( 0 , height - 28*1.2*i , arg_->GetFileName(i).c_str() );
+      //      tex->DrawLatex( 0 ,  28*1.2*i , arg_->GetFileName(i).c_str() );
+      string text = "  - " + arg_->GetFileName(i);
+      tex->DrawLatex( 0.0 ,  1.0 - position , text.c_str() );
+      position += tex->GetTextSize() * 1.05;
+   }
+
+  // tree
+  position += tex->GetTextSize() * 1.05;
+  tex->SetTextSizePixels( 36 );
+  tex->SetTextColor( kBlack );
+  position += tex->GetTextSize() * 1.05;
+  tex->DrawLatex( 0.0 , 1.0 - position , ((string)"Tree: "+vtr_[0]->GetName() ).c_str() );
+
+  position += tex->GetTextSize() * 1.05;
+
+
+  // cut
+  if( vcut_[0] != "" )
+    {
+      tex->DrawLatexNDC( 0.0 , 1.0 - position , "Cut: " );
+      for( unsigned int i=0; i < vcut_.size(); i++ )
+	{
+	  
+	  string text = "  - " + vcut_[i];
+	  tex->DrawLatex( 0.0 , 1.0 - position , text.c_str() );
+      position += tex->GetTextSize() * 1.05;
+      
+	}
+    }
+  else 
+    {
+      tex->DrawLatexNDC( 0.0 , 1.0 - position , "Cut: Nothing" );
+    }
+
+  //  c_->Print( save_.c_str(), "Title: Info" );
+  c_->Print( save_.c_str() );
+
+}
+
 
 void Drawer::Draw()
 {
@@ -167,9 +230,6 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
 
   if( branch_name.find("Hit_DC") != string::npos )
     bin = bin/2;
-
-  cout << branch_name << "\t" << xmin << "\t" << xmax << endl;
-
 
   for( unsigned int i=0; i<vtr_.size(); i++ )
     {

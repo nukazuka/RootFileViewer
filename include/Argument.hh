@@ -107,6 +107,7 @@ public:
   string GetDrawOption(){ return draw_;};
   string GetDrawRatioOption(){ return draw_ratio_;};
   string GetFileName( int num );
+  int    GetFileNum(){ return vfile_.size();};
   string GetSaveName(){ return save_;};
   double GetNormVal(){ return norm_val_;};
 

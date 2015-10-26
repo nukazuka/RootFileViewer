@@ -4,6 +4,7 @@
 #include "TCanvas.h"
 #include "TTree.h"
 #include "TPad.h"
+#include "TLatex.h"
 
 #include "Argument.hh"
 #include "GetName.hh"
@@ -32,6 +33,7 @@ private:
   void Init();
   //  void Draw();
   void Draw();
+  void DrawInfo();
   void DrawPad( TVirtualPad* pad, vector < TH1D* >& vhist, string branch_name, bool ratio);
 
   void GetVectorHist( string branch_name,vector < TH1D* >& vhist );
