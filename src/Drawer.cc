@@ -99,8 +99,8 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
       gPad->SetLogy( arg_->IsLogy() );
 
       string option = arg_->GetDrawOption();
-      //      for( unsigned int i=0; i<vtr_.size(); i++ )
-      for( unsigned int i=vtr_.size()-1; i<vtr_.size(); i-- )
+      for( unsigned int i=0; i<vtr_.size(); i++ )
+      //      for( unsigned int i=vtr_.size()-1; i<vtr_.size(); i-- )
 	{
 
 	  if( i==1 )
