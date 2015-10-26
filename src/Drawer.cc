@@ -60,7 +60,6 @@ void Drawer::DrawInfo()
 
       unsigned int  x, y;
       tex->GetBoundingBox( x , y , false );
-      cout << x << "\t" << y << endl;
       tex->SetTextColor( kColor_[i] );
       //      tex->DrawLatexNDC( 0.05 , 0.9 - 0.1*i , arg_->GetFileName(i).c_str() );
       //      tex->DrawLatex( 0 , height - 28*1.2*i , arg_->GetFileName(i).c_str() );

@@ -23,23 +23,19 @@ void GetRange
 )
 {
   
-  cout << "start GetRange" << endl;
   const int num = tr.size();
   vector < double > vmin_temp, vmax_temp;
 
   TH1D* hist[num];
-  cout << "before for statement" << endl;
   for( int i=0; i<num; i++)
     {
     
       int entry = tr[i]->Draw( branch_name.c_str(), vcut[i].c_str(), "" );
-      cout << branch_name << endl;
       if( entry == 0 )
 	continue;
 
       string hist_name = "hist" + Int2String(i);
 
-      cout << "retrieve hist" << endl;
       hist[i] = (TH1D*)(gPad->GetPrimitive( "htemp" ))->Clone( hist_name.c_str() );
       
       double max_temp = GetMaxOrMin( hist[i], "max" );
@@ -58,7 +54,6 @@ void GetRange
 	  vmin_temp.push_back( min_temp );
 
 	}
-      cout << min_temp << "\t" << max_temp << endl;
     }
 
   if( min < -1.5 )
