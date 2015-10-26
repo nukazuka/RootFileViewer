@@ -55,9 +55,7 @@ void Drawer::Draw()
 	cout << endl;
 
       vector < TH1D* > vhist;
-      cout << "before GetVectorHist" << endl;
       GetVectorHist( vbranch_name_[i], vhist );
-      cout << "after GetVectorHist" << endl;
 
       if( arg_->IsBoth() )
 	{
@@ -158,9 +156,7 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
 {
 
   double xmin = 0.0, xmax = 1.0;
-  cout << "before GetRange" << endl;
   GetRange( vtr_, branch_name, vcut_, xmin, xmax);
-  cout << "after GetRange" << endl;
 
   int bin = xmax - xmin;
 
