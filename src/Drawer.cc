@@ -114,7 +114,7 @@ void Drawer::Draw()
     {
       
       cout << setw( 25 ) << left << vbranch_name_[i] ;
-      if( i%3 == 2 ) 
+      if( i%5 == 2 ) 
 	cout << endl;
 
       vector < TH1D* > vhist;
@@ -160,8 +160,8 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
       gPad->SetLogy( arg_->IsLogy() );
 
       string option = arg_->GetDrawOption();
-      //      for( unsigned int i=0; i<vtr_.size(); i++ )
-      for( unsigned int i=vtr_.size()-1; i<vtr_.size(); i-- )
+      for( unsigned int i=0; i<vtr_.size(); i++ )
+      //      for( unsigned int i=vtr_.size()-1; i<vtr_.size(); i-- )
 	{
 
 	  if( i==1 )
@@ -220,6 +220,7 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
 
   double xmin = 0.0, xmax = 1.0;
   GetRange( vtr_, branch_name, vcut_, xmin, xmax);
+
   int bin = xmax - xmin;
 
   if( bin <= 1 )
