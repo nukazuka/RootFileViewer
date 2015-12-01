@@ -14,6 +14,8 @@ using namespace std;
 class FileManager
 {
 private:
+  bool   bl_show_structure_;
+  
   string file_full_path_;
   string file_path_;
   string file_name_;
@@ -32,7 +34,7 @@ private:
   void ExtractAllTree();
 public:
 
-  FileManager( string file_full_path_arg);
+  FileManager( string file_full_path_arg , bool bl_show_structure );
 
   string GetName(){ return file_name_;};
   string GetPath(){ return file_path_;};

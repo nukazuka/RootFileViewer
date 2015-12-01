@@ -74,7 +74,7 @@ void Argument::Init()
   for( unsigned int i=0; i<vfile_.size(); i++ )
     {
 
-      FileManager* fm = new FileManager( vfile_[i] );
+      FileManager* fm = new FileManager( vfile_[i] , !IsTree() );
       vfm_.push_back( fm );
     }
 

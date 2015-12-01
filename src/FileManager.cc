@@ -3,10 +3,11 @@
 using namespace std;
 
 // constructer
-FileManager::FileManager( string file_full_path_arg )
+FileManager::FileManager( string file_full_path_arg, bool bl_show_structure )
 {
 
   file_full_path_ =   file_full_path_arg;
+  bl_show_structure_ = bl_show_structure;
   Init();
 
 }
@@ -59,7 +60,8 @@ void FileManager::ExtractAllTree()
       if( class_name == "TDirectoryFile" )
 	bl_folder = tf_->GetListOfKeys()->At(i)->IsFolder();
 
-      cout << key_name << "\tclass:" << class_name << "\tfolder:" << bl_folder << endl;
+      if( i == 0 && bl_show_structure_ )
+	cout << key_name << "\tclass:" << class_name << "\tfolder:" << bl_folder << endl;
       structure_ += key_name + "/";
 
       // In case of TTree
@@ -78,7 +80,9 @@ void FileManager::ExtractAllTree()
 	      string key_name2 = tdf->GetListOfKeys()->At(j)->GetName();
 	      string class_name2 = tdf->Get( key_name2.c_str() )->ClassName();
 
-	      cout << "  |- " << class_name2 << "\t" << key_name2 << endl;
+	      if( i == 0 && bl_show_structure_ )
+		cout << "  |- " << class_name2 << "\t" << key_name2 << endl;
+
 	      structure_ += key_name2 + ":";
 	      if( class_name2 == "TTree" )
 		vtr_.push_back( (TTree*)tdf->Get( key_name2.c_str() ) );

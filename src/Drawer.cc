@@ -107,14 +107,21 @@ void Drawer::Draw()
 {
 
   cout << "cut:" << endl;
-  ShowVC( vcut_ );
-  
+  if( vcut_[0].size() == 0 )
+    cout << "\e[A" << "cut: " << "Nothig!!!" << endl;
+  else
+    ShowVC( vcut_ );
+
   for( int i=0; i<branch_num_; i++ )
     {
       
-      cout << setw( 25 ) << left << vbranch_name_[i] ;
-      if( i%5 == 2 ) 
-	cout << endl;
+      string bar = GetRepeatedWords( "=" , 2 * 10 * i / branch_num_ ) + ">";
+      cout << flush << "\r" 
+	   << " ["
+	   << setw(20) << left << bar
+	   << "] "
+	   << setw(5) << setprecision(4) << right 
+	   << 1.*i / branch_num_ * 100 << " %" ;
 
       vector < TH1D* > vhist;
       GetVectorHist( vbranch_name_[i], vhist );
@@ -145,6 +152,8 @@ void Drawer::Draw()
       c_->Clear();
 
     }
+
+  cout << "\r" << " [" << GetRepeatedWords("=", 20) << "] 100% Finished !\n" << endl;
 }
 
 void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_name, bool ratio )

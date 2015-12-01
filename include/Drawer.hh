@@ -27,9 +27,6 @@ private:
 				   kAzure+1 , kYellow-3 , kGreen+2 , kOrange+2  ,
 				   kTeal-5  , kPink-1   };
 
-
-
-
   void Init();
   //  void Draw();
   void Draw();

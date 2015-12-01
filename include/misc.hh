@@ -20,6 +20,9 @@ template < typename T >
 void ShowVC2D( vector <  T  >& vT )
 {
 
+  if( vT.size() == 0 )
+    return ;
+
   for( unsigned int i=0; i<vT.size(); i++ )
     {
 

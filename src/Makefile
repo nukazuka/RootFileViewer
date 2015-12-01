@@ -21,8 +21,10 @@ OBJECTS  = $(SOURCES:.cc=.o)
 $(TARGET): $(OBJECTS)
 	$(COMPILER) -o $@ $^ $(LDFLAGS) $(LIBS)
 
-%.o: %.cc
+%.o: %.cc ../include/misc.hh
 	$(COMPILER) $(CFLAGS) $(INCLUDE) -o $@ -c $< $(LIBS)
+
+# Argument.o: Drawer.cc ../include/misc.hh
 
 all: clean $(TARGET)
 
