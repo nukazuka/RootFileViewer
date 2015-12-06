@@ -184,7 +184,7 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
 	}
 
       //      mh->Print();
-      mh->Draw( option , 0.85, 0.9 - 0.1*vtr_.size() , 1.0, 0.9 );
+      mh->Draw( option , 0.90, 0.9 - 0.1*vtr_.size() , 1.0, 0.9 );
     }
   else
     {
