@@ -9,6 +9,7 @@ int main( int argc, char* argv[] )
   gErrorIgnoreLevel = 5000;
 
   TApplication* app = new TApplication( "app" , &argc, argv );
+
   Drawer* dr = new Drawer( arg );
 
   sw->Stop();

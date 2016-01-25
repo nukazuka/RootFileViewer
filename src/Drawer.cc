@@ -11,7 +11,9 @@ Drawer::Drawer( Argument* arg )
 
   c_->Print( (save_+"[").c_str() );
   DrawInfo();
+
   Draw();
+
   c_->Print( (save_+"]").c_str() );
 
 }
@@ -102,7 +104,6 @@ void Drawer::DrawInfo()
 
 }
 
-
 void Drawer::Draw()
 {
 
@@ -160,8 +161,10 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
 {
 
   PadSetting();
+
   MultiHist* mh = new MultiHist( branch_name , branch_name );
   mh->SetMargins( 0.1 );
+
   if( ratio == false )
     {
 
@@ -172,18 +175,8 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
 
       for( unsigned int i=0; i<vtr_.size(); i++ )
       //      for( unsigned int i=vtr_.size()-1; i<vtr_.size(); i-- )
-	{
+	mh->Add( vhist[i] );
 
-	  //	  if( i==1 )
-	  //	    option += " SAMES";
-
-	  //	  vhist[i]->Draw( option.c_str() );
-
-	  //	  DrawStats( vhist[i], 0.85, 0.8 - 0.1*i, 1.0, 0.9 - 0.1*i);
-	  mh->Add( vhist[i] );
-	}
-
-      //      mh->Print();
       mh->Draw( option , 0.90, 0.9 - 0.1*vtr_.size() , 1.0, 0.9 );
     }
   else
@@ -226,6 +219,7 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
     }
 
   DrawTitle( gPad, 0.07 );
+
   gPad->Update();
 }
 
