@@ -27,6 +27,10 @@ $(TARGET): $(OBJECTS)
 # Argument.o: Drawer.cc ../include/misc.hh
 
 all: clean $(TARGET)
+	make -j $(TARGET)
+	echo "Let's install!!"
+	make install 
+	make clean
 
 install: $(TARGET)
 	install -s $(TARGET) $(INSTALL_DIR)
