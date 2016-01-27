@@ -162,8 +162,12 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
 
   PadSetting();
 
+  TGaxis::SetMaxDigits(3);
+
   MultiHist* mh = new MultiHist( branch_name , branch_name );
-  mh->SetMargins( 0.1 );
+  mh->SetMargins( 0 );
+  mh->SetMarginTop( 0.15 );
+  mh->SetDrawNoEntry( true );
 
   if( ratio == false )
     {
