@@ -27,7 +27,7 @@ void Drawer::Init()
 
   // making canvas
   if( arg_->IsBoth() == true )
-    c_ = GetCanvas( "canvas", "double", false);
+    c_ = GetCanvas( "canvas", "comparison", false);
   else
     c_ = GetCanvas( "canvas", "square", false );
 
@@ -129,8 +129,8 @@ void Drawer::Draw()
 
       if( arg_->IsBoth() )
 	{
-	  c_->Divide( 2, 1 );
-
+	  //	  c_->Divide( 2, 1 );
+	  c_ = GetCanvas( "canvas", "comparison", false);
 	  DrawPad( c_->cd(1), vhist, vbranch_name_[i],  false );
 	  DrawPad( c_->cd(2), vhist, vbranch_name_[i],  true );
 	}
@@ -178,7 +178,6 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
       string option = arg_->GetDrawOption();
 
       for( unsigned int i=0; i<vtr_.size(); i++ )
-      //      for( unsigned int i=vtr_.size()-1; i<vtr_.size(); i-- )
 	mh->Add( vhist[i] );
 
       mh->Draw( option , 0.90, 0.9 - 0.1*vtr_.size() , 1.0, 0.9 );
@@ -196,30 +195,33 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
 	  exit( -1 );
 	}
 
+      MultiHist* mh_ratio = new MultiHist( "mh_ratio", "ratio" );
+      mh->SetRatioMode( true );
+
       TH1D* htemp[vtr_.size()];
       htemp[0] = (TH1D*)vhist[0]->Clone();
+      htemp[0]->Scale( 1.0 / htemp[0]->Integral() );
+
       string option = arg_->GetDrawRatioOption();
 
       for( unsigned int i=1; i<vtr_.size(); i++ )
 	{
 
 	  htemp[i] = (TH1D*)vhist[i]->Clone();
+	  htemp[i]->Scale( 1.0 / htemp[i]->Integral() );
 
 	  if( gPad->GetCanvasID() > 1 )
 	    htemp[i]->SetTitle( "Ratio" );
 	  else
 	    htemp[i]->SetTitle( ((string)vhist[i]->GetTitle() + " ratio" ).c_str() );
 
-
 	  htemp[i]->SetLineWidth( 1 );
 	  htemp[i]->SetMarkerStyle(7);
 
 	  htemp[i]->Divide( htemp[0] );
-
-	  htemp[i]->Draw( option.c_str() );
-	  option += "SAMES";
-	  DrawStats( htemp[i], 0.85, 0.8 - 0.1*(i-1), 1.0, 0.9 - 0.1*(i-1) );
+	  mh_ratio->Add( htemp[i] );
 	}
+      mh_ratio->Draw( option );
     }
 
   DrawTitle( gPad, 0.07 );
@@ -299,7 +301,9 @@ TH1D* Drawer::GetHist( int num, string file_name, TTree* tr, string branch_name,
   SetHist( hist, num );
 
   if( arg_->IsNorm() )
-    hist->Scale( arg_->GetNormVal() / hist->Integral() );
+    {
+      hist->Scale( arg_->GetNormVal() / hist->Integral() );
+    }
 
   return hist;
 }
