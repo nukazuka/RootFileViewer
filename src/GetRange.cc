@@ -61,8 +61,6 @@ void GetRange
   else 
     min = *min_element( vmin_temp.begin(), vmin_temp.end() );
 
-  // ceil: Rounds x upward, returning the smallest integral value that is not less than x.
-  //  max = ceil( *max_element( vmax_temp.begin(), vmax_temp.end() ) ) ;
   max = *max_element( vmax_temp.begin(), vmax_temp.end() );
 
   gPad->Clear();

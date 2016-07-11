@@ -258,8 +258,6 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
 	bin = bin/10;
     }
 
-  cout << "\n" << branch_name << "\t" << bin << endl;
-  
   if( branch_name.find("Hit_DC") != string::npos )
     bin = bin/2;
 
@@ -286,7 +284,6 @@ TH1D* Drawer::GetHist( int num, string file_name, TTree* tr, string branch_name,
   TH1D* hist = new TH1D( name.c_str() , title.c_str(), bin, xmin, xmax );
   ss << branch_name << ">>" << name;
 
-  cout << branch_name << "\t" << bin << "\t" << xmin << "\t" << xmax << endl;
   int entry = tr->Draw( ss.str().c_str(), cut.c_str(), "goff" );
 
   if( entry == 0 )
