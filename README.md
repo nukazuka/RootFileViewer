@@ -33,7 +33,8 @@ Only TTree are supported at this moment.
  logx       |  X axis is set log scale |
  logy       |  Y axis is set log scale |
  xaxis-time |  not ready |
-
+ min-bin    | number of bin at minimum |
+ 
 #### special (just for only personal use of me)
 
  option | detail |
@@ -47,7 +48,7 @@ Only TTree are supported at this moment.
  save    |  not ready |
  out-dir |  Specify the directory which output file will be put in. |
  option  |  A list of options are drawn. |
-
+ no-overwrite | The progress bar is not overwritten. Useful for debagging |
 
 
 ## 今後の予定
