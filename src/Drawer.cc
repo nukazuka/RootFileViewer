@@ -113,11 +113,15 @@ void Drawer::Draw()
   else
     ShowVC( vcut_ );
 
+  string carrige_return = "\r";
+  if( arg_->IsNoOverwrite() )
+    carrige_return = "\n";
+
   for( int i=0; i<branch_num_; i++ )
     {
       
       string bar = GetRepeatedWords( "=" , 2 * 10 * i / branch_num_ ) + ">";
-      cout << flush << "\r" 
+      cout << flush << carrige_return
 	   << " ["
 	   << setw(20) << left << bar
 	   << "] "
@@ -181,6 +185,7 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
 	mh->Add( vhist[i] );
 
       mh->Draw( option , 0.90, 0.9 - 0.1*vtr_.size() , 1.0, 0.9 );
+
     }
   else
     {
@@ -235,14 +240,26 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
   double xmin = 0.0, xmax = 1.0;
   GetRange( vtr_, branch_name, vcut_, xmin, xmax);
 
+  // set a number of bin
   int bin = xmax - xmin;
 
-  if( bin <= 1 )
-    bin = 100;
+  // if #min. bin is specified, check it
+  if( arg_->IsMinBin() == true )
+    {
+      if( bin < arg_->GetMinBin() )
+	bin = arg_->GetMinBin();
+    }
+  else
+    {
+      if( bin <= 1 )
+	bin = 100;
+      
+      while( bin > 500 )
+	bin = bin/10;
+    }
 
-  while( bin > 500 )
-    bin = bin/10;
-
+  cout << "\n" << branch_name << "\t" << bin << endl;
+  
   if( branch_name.find("Hit_DC") != string::npos )
     bin = bin/2;
 
@@ -266,12 +283,10 @@ TH1D* Drawer::GetHist( int num, string file_name, TTree* tr, string branch_name,
   string title = branch_name;
 
   stringstream ss, ss_title;
-  ss << branch_name << ">>htemp" 
-     << "(" 
-     << bin << ", " 
-     << xmin << ", " 
-     << xmax << ")";
+  TH1D* hist = new TH1D( name.c_str() , title.c_str(), bin, xmin, xmax );
+  ss << branch_name << ">>" << name;
 
+  cout << branch_name << "\t" << bin << "\t" << xmin << "\t" << xmax << endl;
   int entry = tr->Draw( ss.str().c_str(), cut.c_str(), "goff" );
 
   if( entry == 0 )
@@ -292,11 +307,6 @@ TH1D* Drawer::GetHist( int num, string file_name, TTree* tr, string branch_name,
       cerr << "Draw(" << ss.str() << "\n, " << cut << "\n, goff) == 0" << endl;
       exit(-1);
     }
-
-  TH1D* hist = (TH1D*)gDirectory->Get( "htemp" );
-
-  hist->SetName( name.c_str() );
-  hist->SetTitle( title.c_str() );
 
   SetHist( hist, num );
 
