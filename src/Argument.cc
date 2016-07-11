@@ -29,6 +29,7 @@ void Argument::Init()
 
   ExtractFileName();
 
+  // get flag
   bl_logx_        = parser_->IsSpecified( "logx" );
   bl_logy_        = parser_->IsSpecified( "logy" );
   bl_both_        = parser_->IsSpecified( "both" );
@@ -43,6 +44,8 @@ void Argument::Init()
   bl_test_        = parser_->IsSpecified( "test" );
   bl_force_       = parser_->IsSpecified( "force" );
   bl_out_dir_     = parser_->IsSpecified( "out-dir" );
+  bl_min_bin_     = parser_->IsSpecified( "min-bin" );
+  bl_no_overwrite_= parser_->IsSpecified( "no-overwrite" );
 
   // special option
   bl_s_cut_DY2014_ = parser_->IsSpecified( "s-cut-DY2014" );
@@ -55,6 +58,7 @@ void Argument::Init()
     parser_->IsSpecified( "suffix" ) ? 
     "_" + parser_->GetArgument( "suffix" ) : "";
 
+  // get value
   if( bl_tree_ )
     specified_tree_name_ = parser_->GetArgument( "tree" );
 
@@ -63,6 +67,9 @@ void Argument::Init()
 
   if( parser_->IsSpecified( "norm-val" ) )
     norm_val_ = String2Double( parser_->GetArgument( "norm-val" ) );
+  
+  if( parser_->IsSpecified( "min-bin" ) )
+    min_bin_num_ = String2Int( parser_->GetArgument( "min-bin" ) );
 
   //  bl_test_        = parser_->IsSpecified( "test" );
   //  bl_debug_       = parser_->IsSpecified( "debug" );
@@ -404,6 +411,8 @@ void Argument::Option()
        << "Y axis is set log scale" << endl;
   cout << "|" << setw( indent ) << " --xaxis-time : "
        << "not ready" << endl;
+  cout << "|" << setw( indent ) << " --min-bin : "
+       << "a number bins at minimum." << endl;
 
   // *** SPECIAL ******************************************************
 
@@ -425,6 +434,8 @@ void Argument::Option()
        << "Specify the directory which output file will be put in." << endl;
   cout << "|" << setw( indent ) << " --option : " 
        << "A list of options are drawn." << endl;
+  cout << "|" << setw( indent ) << " --no-overwrite : " 
+       << "Progress bar is not overwritten" << endl;
 
 
   /*
