@@ -201,7 +201,9 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
 	}
 
       MultiHist* mh_ratio = new MultiHist( "mh_ratio", "ratio" );
-      mh->SetRatioMode( true );
+      mh_ratio->SetRatioMode( true );
+      mh_ratio->SetIncludeErrorBar( true );
+      mh_ratio->SetDrawNoEntry( true );
 
       TH1D* htemp[vtr_.size()];
       htemp[0] = (TH1D*)vhist[0]->Clone();
@@ -226,6 +228,14 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
 	  htemp[i]->Divide( htemp[0] );
 	  mh_ratio->Add( htemp[i] );
 	}
+      
+      // trick to get same frame, should be improved
+      for( unsigned int i=0; i<vtr_.size(); i++ )
+	mh->Add( vhist[i] );
+      mh->DrawFrame();
+
+      mh_ratio->SetXmin( mh->GetXmin() );
+      mh_ratio->SetXmax( mh->GetXmax() );
       mh_ratio->Draw( option );
     }
 
