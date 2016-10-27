@@ -261,10 +261,8 @@ string Argument::ExtractSaveName()
       + tree_info + "-"
       + setting_info + ".pdf";
 
-  /*
   if( rtn.size() > 110 )
     rtn = dir + "TooLong-" + rtn.substr( dir.size(), 100 ) + ".pdf";
-  */
 
   return rtn;
 }
