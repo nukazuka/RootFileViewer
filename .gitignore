@@ -1,3 +1,5 @@
 *~
 src/*.root
 src/*.pdf
+src/*.o
+src/rfv
