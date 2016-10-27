@@ -2,7 +2,7 @@ COMPILER = g++
 #COMPILER = clang++
 #COMPILER = g++-4.4
 CFLAGS    =
-CFLAGS   += -Wall -Wextra -Winit-self -Wno-unused-parameter -Wfloat-equal
+#CFLAGS   += -Wall -Wextra -Winit-self -Wno-unused-parameter -Wfloat-equal
 CFLAGS   += -std=c++11
 CFLAGS   += -O3
 #CFLAGS   += -g
