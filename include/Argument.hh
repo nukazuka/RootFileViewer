@@ -68,7 +68,7 @@ private:
   bool bl_out_dir_	= false;
   bool bl_min_bin_	= false;
   bool bl_no_overwrite_ = false;
-
+  //  bool bl_sve_          = false;
   // special option
   bool bl_s_cut_DY2014_ = false;
 

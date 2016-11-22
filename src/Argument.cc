@@ -46,6 +46,7 @@ void Argument::Init()
   bl_out_dir_     = parser_->IsSpecified( "out-dir" );
   bl_min_bin_     = parser_->IsSpecified( "min-bin" );
   bl_no_overwrite_= parser_->IsSpecified( "no-overwrite" );
+  //  bl_save_        = parser_->IsSpecified( "save" );
 
   // special option
   bl_s_cut_DY2014_ = parser_->IsSpecified( "s-cut-DY2014" );
@@ -71,6 +72,11 @@ void Argument::Init()
   if( parser_->IsSpecified( "min-bin" ) )
     min_bin_num_ = String2Int( parser_->GetArgument( "min-bin" ) );
 
+  if( parser_->IsSpecified( "save" ) )
+    save_ = parser_->GetArgument( "save" );
+  else
+    save_ = "none";
+
   //  bl_test_        = parser_->IsSpecified( "test" );
   //  bl_debug_       = parser_->IsSpecified( "debug" );
   //  bl_in_tra_      = parser_->IsSpecified( "in-tra-mode" );
@@ -89,7 +95,9 @@ void Argument::Init()
 
   cout << vfm_[0]->GetTree( tree_id_ )->GetName() << " is used." << endl;
 
-  save_ = ExtractSaveName();
+  if( save_ == "none" )
+    save_ = ExtractSaveName();
+
 }
 
 bool Argument::CheckFileStructure()
@@ -427,7 +435,7 @@ void Argument::Option()
        << "=== misc " << GetRepeatedWords("=", length-9 ) << endl;
 
   cout << "|" << setw( indent ) << " --save : " 
-       << "not ready" << endl;
+       << "Specify name ( & path ) of output file. Users need to take responsibillty of path and suffix." << endl;
   cout << "|" << setw( indent ) << " --out-dir : " 
        << "Specify the directory which output file will be put in." << endl;
   cout << "|" << setw( indent ) << " --option : " 
