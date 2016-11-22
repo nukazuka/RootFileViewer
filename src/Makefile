@@ -4,7 +4,7 @@ COMPILER = g++
 CFLAGS    =
 #CFLAGS   += -Wall -Wextra -Winit-self -Wno-unused-parameter -Wfloat-equal
 CFLAGS   += -std=c++11
-CFLAGS   += -O3
+CFLAGS   += -O -O1 -O2 -O3
 #CFLAGS   += -g
 CFLAGS   += `root-config --cflags`
 LDFLAGS   =

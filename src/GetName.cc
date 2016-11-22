@@ -17,7 +17,10 @@ void GetName( vector < TTree* >& vtr, vector < string >& vname)
       exit(-1);
     }
 
+  // container of branch names
   vector < vector < string > > vvname(num);
+  // container of array size of branch
+  vector < vector < int    > > vvarray(num); 
 
   // loop over tree
   for( int i=0; i<num; i++)
@@ -27,8 +30,14 @@ void GetName( vector < TTree* >& vtr, vector < string >& vname)
       for( int j=0; j<vtr[i]->GetNbranches(); j++)
 	{
 
+	  // get & store branch name
 	  string name = vtr[i]->GetListOfBranches()->At(j)->GetName();
 	  vvname[i].push_back( name );
+
+	  // get & store array size of this branch
+	  TLeaf* leaf = (TLeaf*)vtr[i]->GetListOfLeaves()->At(j);
+	  int array_num = leaf->GetLen();
+	  vvarray[i].push_back( array_num );
 	}
     }
 
@@ -58,8 +67,26 @@ void GetName( vector < TTree* >& vtr, vector < string >& vname)
       // counter is equal to (# of TTree -1 )
       if( counter == vvname.size()-1 )
 	{
-	  vname.push_back( vvname[0][i] );
-	}
 
+	  // store this branch name anyway
+	  vname.push_back( vvname[0][i] );
+
+	  // if this branch is array, store like :
+	  // - branch
+	  // - branch[0]
+	  // - branch[1]	  
+	  if( vvarray[0][i] > 1 )
+	    {
+
+	      // loop over array dimension
+	      for( int j=0; j<vvarray[0][i]; j++ )
+		{
+		  stringstream branch_name;
+		  branch_name << vvname[0][i]
+			      << "[" << j << "]";
+		  vname.push_back( branch_name.str() );	  
+		}
+	    }
+	}
     }
 }
