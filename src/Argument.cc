@@ -47,6 +47,7 @@ void Argument::Init()
   bl_min_bin_     = parser_->IsSpecified( "min-bin" );
   bl_no_overwrite_= parser_->IsSpecified( "no-overwrite" );
   //  bl_save_        = parser_->IsSpecified( "save" );
+  bl_bin_factor_= parser_->IsSpecified( "bin-factor" );
 
   // special option
   bl_s_cut_DY2014_ = parser_->IsSpecified( "s-cut-DY2014" );
@@ -76,6 +77,10 @@ void Argument::Init()
     save_ = parser_->GetArgument( "save" );
   else
     save_ = "none";
+
+  if( parser_->IsSpecified( "bin-factor" ) )
+    bin_factor_ = String2Double( parser_->GetArgument( "bin-factor" ) );
+  
 
   //  bl_test_        = parser_->IsSpecified( "test" );
   //  bl_debug_       = parser_->IsSpecified( "debug" );
@@ -411,14 +416,17 @@ void Argument::Option()
   cout << "|" << setw( indent ) << " --draw-ratio : " 
        << "not ready" << endl;
 
+  cout << "|" << setw( indent ) << " --min-bin : "
+       << "a number bins at minimum." << endl;
+  cout << "|" << setw( indent ) << " --bin-factor : " 
+       << "factor of bin number" << endl;
+
   cout << "|" << setw( indent ) << " --logx : " 
        << "X axis is set log scale" << endl;
   cout << "|" << setw( indent ) << " --logy : "
        << "Y axis is set log scale" << endl;
   cout << "|" << setw( indent ) << " --xaxis-time : "
        << "not ready" << endl;
-  cout << "|" << setw( indent ) << " --min-bin : "
-       << "a number bins at minimum." << endl;
 
   // *** SPECIAL ******************************************************
 

@@ -252,7 +252,7 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
 
   // set a number of bin
   //  int bin = xmax - xmin; // not good
-  int bin = sqrt( vtr_[0]->GetEntries( vcut_[0].c_str() ) );
+  int bin = sqrt( vtr_[0]->GetEntries( vcut_[0].c_str() ) ) * arg_->GetBinFactor();
   
   // if #min. bin is specified, check it
   if( arg_->IsMinBin() == true )
