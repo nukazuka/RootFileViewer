@@ -36,7 +36,8 @@ private:
   int min_bin_num_ = -1;
 
   double norm_val_ = 1.0;
-
+  double bin_factor_ = 1.0;
+  
   string data_;
   string data_specified_;
   string cut_;
@@ -68,10 +69,10 @@ private:
   bool bl_out_dir_	= false;
   bool bl_min_bin_	= false;
   bool bl_no_overwrite_ = false;
-
+  //  bool bl_sve_          = false;
   // special option
   bool bl_s_cut_DY2014_ = false;
-
+  bool bl_bin_factor_   = false;
   /*
   bool   bl_RD_rand_cut_;
   bool   bl_test_;
@@ -107,6 +108,7 @@ public:
 
   void GetVectorTree		( vector < TTree* >& vtr_arg );
   void GetVectorCut		( vector < string >& vcut_arg );
+  double GetBinFactor           (){ return bin_factor_;};
   string GetDrawOption		(){ return draw_;};
   string GetDrawRatioOption	(){ return draw_ratio_;};
   string GetFileName		( int num );
