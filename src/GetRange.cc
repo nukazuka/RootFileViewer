@@ -29,33 +29,38 @@ void GetRange
   TH1D* hist[num];
   for( int i=0; i<num; i++)
     {
-    
-      int entry = tr[i]->Draw( branch_name.c_str(), vcut[i].c_str(), "" );
+
+      int entry = tr[i]->GetEntries( vcut[i].c_str() );
       if( entry == 0 )
 	continue;
 
       string hist_name = "hist" + Int2String(i);
 
-      hist[i] = (TH1D*)(gPad->GetPrimitive( "htemp" ))->Clone( hist_name.c_str() );
+      //      hist[i] = (TH1D*)(gPad->GetPrimitive( "htemp" ))->Clone( hist_name.c_str() );
+      //      double max_temp = GetMaxOrMin( hist[i], "max" );
+      double max_temp = GetMaxVal( tr[i] , branch_name, vcut[i] );
+      //      double min_temp = GetMaxOrMin( hist[i], "min" );
+      double min_temp = GetMinVal( tr[i] , branch_name, vcut[i] );
+
+      // if( (double)hist[i]->GetBinWidth(0) > (max_temp - min_temp)/4 )
+      // 	{
+
+      // 	  vmax_temp.push_back( max_temp + hist[i]->GetBinWidth(0) );
+      // 	  vmin_temp.push_back( min_temp + hist[i]->GetBinWidth(0) );
+      // 	}
+      // else
+      // 	{
+
+      // 	  vmax_temp.push_back( max_temp );
+      // 	  vmin_temp.push_back( min_temp );
+
+      // 	}
       
-      double max_temp = GetMaxOrMin( hist[i], "max" );
-      double min_temp = GetMaxOrMin( hist[i], "min" );
+      vmax_temp.push_back( max_temp );
+      vmin_temp.push_back( min_temp );
 
-      if( (double)hist[i]->GetBinWidth(0) > (max_temp - min_temp)/4 )
-	{
-
-	  vmax_temp.push_back( max_temp + hist[i]->GetBinWidth(0) );
-	  vmin_temp.push_back( min_temp + hist[i]->GetBinWidth(0) );
-	}
-      else
-	{
-
-	  vmax_temp.push_back( max_temp );
-	  vmin_temp.push_back( min_temp );
-
-	}
     }
-
+  
   if( min < -1.5 )
     min = floor( *min_element( vmin_temp.begin(), vmin_temp.end() ) );
   else 

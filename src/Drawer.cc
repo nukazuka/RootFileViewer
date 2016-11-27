@@ -6,7 +6,6 @@ Drawer::Drawer( Argument* arg )
 {
 
   arg_ = arg;
-
   Init();
 
   c_->Print( (save_+"[").c_str() );
@@ -128,9 +127,14 @@ void Drawer::Draw()
 	   << setw(5) << setprecision(4) << right 
 	   << 1.*i / branch_num_ * 100 << " %" ;
 
+
+      TBranch* br = (TBranch*)vtr_[0]->GetListOfBranches()->At(i);
+      string class_name = br->GetClassName();
+      if( class_name != "" )
+	continue;
+
       vector < TH1D* > vhist;
       GetVectorHist( vbranch_name_[i], vhist );
-
       if( arg_->IsBoth() )
 	{
 	  //	  c_->Divide( 2, 1 );
