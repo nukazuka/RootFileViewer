@@ -116,7 +116,8 @@ void Drawer::Draw()
   if( arg_->IsNoOverwrite() )
     carrige_return = "\n";
 
-  for( int i=0; i<branch_num_; i++ )
+  //  for( int i=0; i<branch_num_; i++ )
+  for( int i=40; i<branch_num_; i++ )
     {
       
       string bar = GetRepeatedWords( "=" , 2 * 10 * i / branch_num_ ) + ">";
@@ -132,14 +133,15 @@ void Drawer::Draw()
       
       TBranch* br = (TBranch*)vtr_[0]->GetBranch( branch_name_corrected.c_str() );
       string class_name = br->GetClassName();
+
       if( class_name != "" )
 	continue;
 
       vector < TH1D* > vhist;
       GetVectorHist( vbranch_name_[i], vhist );
+      //      continue;
       if( arg_->IsBoth() )
 	{
-	  //	  c_->Divide( 2, 1 );
 	  c_ = GetCanvas( "canvas", "comparison", false);
 	  DrawPad( c_->cd(1), vhist, vbranch_name_[i],  false );
 	  DrawPad( c_->cd(2), vhist, vbranch_name_[i],  true );
@@ -278,6 +280,23 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
   if( branch_name.find("Hit_DC") != string::npos )
     bin = bin/2;
 
+  // if this branch is boolian, change #bin, xmin and xmax
+  string branch_name_corrected
+    = branch_name.substr( 0 , branch_name.find( "[" ) );
+  cout << branch_name_corrected << endl;
+  TLeaf* leaf = vtr_[0]->GetLeaf( branch_name_corrected.c_str() );
+
+  if( leaf != nullptr )
+    if( (string)leaf->GetTypeName() == "Bool_t" )
+      {
+	bin = 2;
+	xmin = 0;
+	xmax =1;
+	
+      }
+  
+  cout << "\n" << branch_name << "\t" << bin << "\t" << xmin << "\t" << xmax << endl;
+  
   for( unsigned int i=0; i<vtr_.size(); i++ )
     {
 
@@ -294,15 +313,18 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
 TH1D* Drawer::GetHist( int num, string file_name, TTree* tr, string branch_name, string cut, int bin, double xmin, double xmax )
 {
 
-  string name = GetBaseName(file_name);
+  //  string name = GetBaseName(file_name) 
+  string name = GetBaseName(file_name) + branch_name + Int2String( num );
   string title = branch_name;
 
   stringstream ss, ss_title;
   TH1D* hist = new TH1D( name.c_str() , title.c_str(), bin, xmin, xmax );
   ss << branch_name << ">>" << name;
-
+  cout << branch_name << "\t" << ss.str() << "\t" << cut << endl;
+  
   int entry = tr->Draw( ss.str().c_str(), cut.c_str(), "goff" );
-
+  hist->Fill( true );
+  
   if( entry == 0 )
     {
       cerr << "TH1D* Drawer::GetHist( int num, string file_name, TTree* tr, string branch_name, string cut, int bin, double xmin, double xmax )" << endl;
