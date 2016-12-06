@@ -125,10 +125,12 @@ void Drawer::Draw()
 	   << setw(20) << left << bar
 	   << "] "
 	   << setw(5) << setprecision(4) << right 
-	   << 1.*i / branch_num_ * 100 << " %" ;
+	   << 1.*i / branch_num_ * 100 << " %";
 
-
-      TBranch* br = (TBranch*)vtr_[0]->GetListOfBranches()->At(i);
+      string branch_name_corrected
+	= vbranch_name_[i].substr( 0 , vbranch_name_[i].find( "[" ) );
+      
+      TBranch* br = (TBranch*)vtr_[0]->GetBranch( branch_name_corrected.c_str() );
       string class_name = br->GetClassName();
       if( class_name != "" )
 	continue;
