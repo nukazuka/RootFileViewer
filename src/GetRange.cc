@@ -29,7 +29,6 @@ void GetRange
   TH1D* hist[num];
   for( int i=0; i<num; i++)
     {
-
       int entry = tr[i]->GetEntries( vcut[i].c_str() );
       if( entry == 0 )
 	continue;
@@ -41,7 +40,7 @@ void GetRange
       vmax_temp.push_back( max_temp );
       vmin_temp.push_back( min_temp );
     }
-  
+
   if( min < -1.5 )
     min = floor( *min_element( vmin_temp.begin(), vmin_temp.end() ) );
   else 

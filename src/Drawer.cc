@@ -136,6 +136,7 @@ void Drawer::Draw()
       if( class_name != "" )
 	continue;
 
+      
       vector < TH1D* > vhist;
       GetVectorHist( vbranch_name_[i], vhist );
 
@@ -283,7 +284,7 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
   // if this branch is boolian, change #bin, xmin and xmax
   string branch_name_corrected
     = branch_name.substr( 0 , branch_name.find( "[" ) );
-  cout << branch_name_corrected << endl;
+
   TLeaf* leaf = vtr_[0]->GetLeaf( branch_name_corrected.c_str() );
 
   if( leaf != nullptr )
@@ -294,8 +295,6 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
 	xmax =2;
 	
       }
-  
-  cout << "\n" << branch_name << "\t" << bin << "\t" << xmin << "\t" << xmax << endl;
   
   for( unsigned int i=0; i<vtr_.size(); i++ )
     {
@@ -315,14 +314,13 @@ TH1D* Drawer::GetHist( int num, string file_name, TTree* tr, string branch_name,
 
   // this hist naming cause warning since same name will be used for all branches
   // for display of stats box, I don't fix it
-  string name = GetBaseName(file_name) 
+  string name = GetBaseName(file_name);
   //  string name = GetBaseName(file_name) + branch_name + Int2String( num );
   string title = branch_name;
 
   stringstream ss, ss_title;
   TH1D* hist = new TH1D( name.c_str() , title.c_str(), bin, xmin, xmax );
   ss << branch_name << ">>" << name;
-  cout << branch_name << "\t" << ss.str() << "\t" << cut << endl;
   
   int entry = tr->Draw( ss.str().c_str(), cut.c_str(), "goff" );
   hist->Fill( true );
