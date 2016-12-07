@@ -155,6 +155,7 @@ void Drawer::Draw()
 	  DrawPad( c_->cd(1), vhist, vbranch_name_[i],  false );
 	}
 
+      
       string page_title = "Title: " + Replace( vbranch_name_[i], "tex", "txe" );
       c_->Print( save_.c_str(), page_title.c_str() );
 
@@ -257,7 +258,7 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
 
   double xmin = 0.0, xmax = 1.0;
   GetRange( vtr_, branch_name, vcut_, xmin, xmax);
-
+  //  return;
   // set a number of bin
   //  int bin = xmax - xmin; // not good
   int bin = sqrt( vtr_[0]->GetEntries( vcut_[0].c_str() ) ) * arg_->GetBinFactor();
