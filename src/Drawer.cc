@@ -138,7 +138,7 @@ void Drawer::Draw()
 
       vector < TH1D* > vhist;
       GetVectorHist( vbranch_name_[i], vhist );
-      //      continue;
+
       if( arg_->IsBoth() )
 	{
 	  c_ = GetCanvas( "canvas", "comparison", false);
@@ -257,7 +257,7 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
 
   double xmin = 0.0, xmax = 1.0;
   GetRange( vtr_, branch_name, vcut_, xmin, xmax);
-  //  return;
+
   // set a number of bin
   //  int bin = xmax - xmin; // not good
   int bin = sqrt( vtr_[0]->GetEntries( vcut_[0].c_str() ) ) * arg_->GetBinFactor();
@@ -313,8 +313,10 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
 TH1D* Drawer::GetHist( int num, string file_name, TTree* tr, string branch_name, string cut, int bin, double xmin, double xmax )
 {
 
-  //  string name = GetBaseName(file_name) 
-  string name = GetBaseName(file_name) + branch_name + Int2String( num );
+  // this hist naming cause warning since same name will be used for all branches
+  // for display of stats box, I don't fix it
+  string name = GetBaseName(file_name) 
+  //  string name = GetBaseName(file_name) + branch_name + Int2String( num );
   string title = branch_name;
 
   stringstream ss, ss_title;
