@@ -116,8 +116,7 @@ void Drawer::Draw()
   if( arg_->IsNoOverwrite() )
     carrige_return = "\n";
 
-  //  for( int i=0; i<branch_num_; i++ )
-  for( int i=40; i<branch_num_; i++ )
+  for( int i=0; i<branch_num_; i++ )
     {
       
       string bar = GetRepeatedWords( "=" , 2 * 10 * i / branch_num_ ) + ">";
@@ -290,9 +289,9 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
   if( leaf != nullptr )
     if( (string)leaf->GetTypeName() == "Bool_t" )
       {
-	bin = 2;
+	bin  = 2;
 	xmin = 0;
-	xmax =1;
+	xmax =2;
 	
       }
   
