@@ -135,6 +135,9 @@ void Argument::ExtractCut()
       else
 	cut = "";
 
+      cout << cut << " ";
+      cut = Replace( cut , "\\!" , "!" );
+      cout << "\t" << cut << endl;
       // random trigger cut for DY2014
       // cut is apllied only real data
       bool bl_temp = ( vfile_[i].find("RD") != string::npos );
@@ -252,7 +255,7 @@ string Argument::ExtractSaveName()
   // cut infomation       
   string cut_info = "";
   if( bl_cut_ )
-    cut_info = cut_;
+    cut_info = Replace( cut_ , "\\!" , "NOT_" );
 
   // special infomation
   if( bl_s_cut_DY2014_ )
@@ -275,7 +278,8 @@ string Argument::ExtractSaveName()
       + setting_info + ".pdf";
 
   if( rtn.size() > 110 )
-    rtn = dir + "TooLong-" + rtn.substr( dir.size(), 100 ) + ".pdf";
+    //    rtn = dir + "TooLong-" + rtn.substr( dir.size(), 100 ) + ".pdf";
+    rtn = dir + "TooLong-" + cut_info + ".pdf";
 
   return rtn;
 }
