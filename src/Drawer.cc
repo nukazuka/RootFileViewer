@@ -98,8 +98,8 @@ void Drawer::DrawInfo()
       tex->DrawLatexNDC( 0.0 , 1.0 - position , "Cut: Nothing" );
     }
 
-  //  c_->Print( save_.c_str(), "Title: Info" );
-  c_->Print( save_.c_str() );
+  c_->Print( save_.c_str(), "Title: Info" );
+  //  c_->Print( save_.c_str() );
 
 }
 
@@ -117,8 +117,9 @@ void Drawer::Draw()
     carrige_return = "\n";
 
   for( int i=0; i<branch_num_; i++ )
+  //  for( int i=0; i<1; i++ )
     {
-      
+
       string bar = GetRepeatedWords( "=" , 2 * 10 * i / branch_num_ ) + ">";
       cout << flush << carrige_return
 	   << " ["
@@ -136,7 +137,6 @@ void Drawer::Draw()
       if( class_name != "" )
 	continue;
 
-      
       vector < TH1D* > vhist;
       GetVectorHist( vbranch_name_[i], vhist );
 
@@ -258,7 +258,6 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
 
   double xmin = 0.0, xmax = 1.0;
   GetRange( vtr_, branch_name, vcut_, xmin, xmax);
-
   // set a number of bin
   //  int bin = xmax - xmin; // not good
   int bin = sqrt( vtr_[0]->GetEntries( vcut_[0].c_str() ) ) * arg_->GetBinFactor();

@@ -17,6 +17,7 @@ double GetMax( TH1D* hist )
 #include <vector>
 #include <string>
 
+#include "TLeaf.h"
 #include "TTree.h"
 #include "TH1.h"
 #include "TPad.h"

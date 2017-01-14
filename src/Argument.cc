@@ -36,6 +36,7 @@ void Argument::Init()
   bl_ratio_       = parser_->IsSpecified( "ratio" );
   bl_wait_        = parser_->IsSpecified( "wait" );
   bl_tree_        = parser_->IsSpecified( "tree" );
+  //  bl_tree_name_   = parser_->IsSpecified( "tree-name" );
   bl_branch_      = parser_->IsSpecified( "branch" );
   bl_draw_        = parser_->IsSpecified( "draw" );
   bl_draw_ratio_  = parser_->IsSpecified( "draw-ratio" );
@@ -64,6 +65,10 @@ void Argument::Init()
   if( bl_tree_ )
     specified_tree_name_ = parser_->GetArgument( "tree" );
 
+  //  if( bl_tree_ )
+  //    specified_tree_name_ = parser_->GetArgument( "tree" );
+
+  
   if( bl_branch_ )
     specified_branch_name_ = parser_->GetArgument( "branch" );
 
@@ -90,11 +95,7 @@ void Argument::Init()
 
   // make a vector of FileManager
   for( unsigned int i=0; i<vfile_.size(); i++ )
-    {
-
-      FileManager* fm = new FileManager( vfile_[i] , !IsTree() );
-      vfm_.push_back( fm );
-    }
+    vfm_.push_back( new FileManager( vfile_[i] , !IsTree() ) );
 
   IsTree() ? ExtractTreeID() : AskTreeID();
 
@@ -176,24 +177,41 @@ void Argument::ExtractFileName()
 void Argument::ExtractTreeID()
 {
 
-  for( int i=0; i<vfm_[0]->GetTreeNum(); i++ )
-    {
-
-      if( specified_tree_name_ == vfm_[0]->GetTree(i)->GetName() )
-	{
-	  tree_id_ = i;
-	  return;
-	}
-    }
-
   if( IsNumber( specified_tree_name_ ) )
     {
-
       int id = String2Int( specified_tree_name_ );
       if( id > -1 && id < vfm_[0]->GetTreeNum() )
 	tree_id_ = id;
 
+      return;
     }
+  else
+    {
+      for( int i=0; i<vfm_[0]->GetTreeNum(); i++ )
+      	{	  
+
+      	  if( specified_tree_name_ == vfm_[0]->GetTree(i)->GetName() )
+      	    {
+      	      tree_id_ = i;
+      	      //	      return;
+      	    }
+      	}
+    }
+
+  /////////////////////////////////////////
+  // vector version
+  for( int i=0; i<vfile_.size(); i++ )
+    {
+      for( int j=0; j<vfm_[i]->GetTreeNum(); j++ )
+	{
+	  if( specified_tree_name_ == (string)(vfm_[i]->GetTree(j)->GetName()) )
+	    {
+	      vtree_id_.push_back(j);
+	      break;
+	    }
+	}
+    }
+
 }
 
 // output name is :
@@ -279,7 +297,7 @@ string Argument::ExtractSaveName()
 
   if( rtn.size() > 110 )
     //    rtn = dir + "TooLong-" + rtn.substr( dir.size(), 100 ) + ".pdf";
-    rtn = dir + "TooLong-" + cut_info + ".pdf";
+    rtn = dir + "TooLong-" + cut_info.substr( 0, 50)  + ".pdf";
 
   return rtn;
 }
@@ -288,8 +306,8 @@ void Argument::AskTreeID()
 {
 
   cout << "Which tree do you want to draw?" << endl;
-  vfm_[0]->ShowTree();
-  cout << -1 << " exit\n" << endl;
+  ShowTreeInfo();
+  cout << "--------------" << endl;
   
   int id = -2;
   bool bl_exit = false;
@@ -316,13 +334,67 @@ void Argument::AskTreeID()
     }
 }
 
+void Argument::ShowTreeInfo()
+{
+
+  bool bl_same_structure = true;
+  // loop over FileManager
+  for( int i=0; i<vfm_.size()-1; i++ )
+    {
+      if( vfm_[i]->IsSameTreeStructure( vfm_[i+1] ) == false )
+	{
+	  bl_same_structure = false;
+	  break;
+	}
+    }
+
+  if( bl_same_structure == true )
+    {
+      vfm_[0]->ShowTree();
+    }
+  else
+    for( int i=0; i<vfm_.size(); i++ )
+      {
+	//	  string stemp( "-" , vfm_[i]->GetName().size() );
+	string stemp( vfm_[i]->GetName().size() , '-');
+	cout << stemp << endl;
+	cout << vfm_[i]->GetName() << endl;
+	vfm_[i]->ShowTree();
+      }
+  
+  //  vector < string > vsame_name = FileManager::ExtractSameTreeName( vfm_ );
+
+  vector < string > vsame_name;// = vfm_[0]->ExtractSameTreeName( vfm_[1] );
+  /*
+  cout << "number of same name = " << vsame_name.size() << endl;
+  //  cout << vsame_name[0] << endl;
+  for( int i=0; vsame_name.size(); i++ )
+    cout << i << ":" << vsame_name[i] << endl;
+  */
+
+  for( int i=0; i<vfm_.size(); i++ )
+    for( int j=0; j<vfm_[i]->GetTreeNum(); j++ )
+      vsame_name.push_back( vfm_[i]->GetTree(j)->GetName() );
+   
+}
+
 // public functions
 
 void Argument::GetVectorTree( vector < TTree* >& vtr_arg )
 {
 
+  //  for( unsigned int i=0; i<vfm_.size(); i++ )
+  //    vtr_arg.push_back( vfm_[i]->GetTree( tree_id_ ) );
+
+  for( int i=0; i<vfm_.size(); i++ )
+    cout << i << " "
+	 << vfm_[i]->GetName() << " "
+	 << vtree_id_[i]
+	 << endl;
+  
+  // vector version
   for( unsigned int i=0; i<vfm_.size(); i++ )
-    vtr_arg.push_back( vfm_[i]->GetTree( tree_id_ ) );
+    vtr_arg.push_back( vfm_[i]->GetTree( vtree_id_[i] ) );
 }
 
 void Argument::GetVectorCut( vector < string >& vcut_arg )
@@ -360,76 +432,85 @@ void Argument::Option()
 {
 
   int length = 80;
-  int indent = 20;
+  int indent_num = 20;
+  string indent( indent_num , ' ' );
   cout << endl;
   cout << "--OPTIONS"
        << GetRepeatedWords( "-", length-8 ) << endl;
 
   // --data
   // *** DATA SELECTION ******************************************************
-  cout << "|" << setw( indent ) << " --data : "
-       << "You can specify data like following" << endl;
-  cout << "|" << GetRepeatedWords( " " , indent )
-       << "--data=\"MC.root|data/MC2.root\"" << endl;
-  cout << "|" << GetRepeatedWords( " " , indent )
-       << "\"|\" is used as a separator." << endl;
+  cout << "|" << setw( indent_num ) << " --data : "
+       << "You can specify data like following:" << endl;
+  cout << "|" << indent
+       << " --data=\"MC.root|data/MC2.root\"" << endl;
+  cout << "|" << indent
+       << "or" << endl;
+  cout << "|" << indent
+       << " --data=\"MC.root\" --data=\"data/MC2.root\"" << endl;
+  cout << "|" << indent
+       << "where \"|\" is used as a separator." << endl;
 
   // *** TREE(BRANCH) SELECTION ******************************************************
   cout << "|" 
        << "=== data selection " << GetRepeatedWords("=", length-19 ) << endl;
 
-  cout << "|" << setw( indent ) << " --force : "
+  cout << "|" << setw( indent_num ) << " --force : "
        << "Ignore differences of structure of Root files" << endl;
 
-  cout << "|" << setw( indent ) << " --tree : "
+  cout << "|" << setw( indent_num ) << " --tree : "
        << "you can specify the tree which will be drawn like following:" << endl;
-  cout << "|" << GetRepeatedWords( " " , indent )
-       << "--tree=\"MC_event\"" << endl;
-  cout << "|" << GetRepeatedWords( " " , indent )
-       << "--tree=1" << endl;
-  cout << "|" << GetRepeatedWords( " " , indent )
+  cout << "|" << indent
+       << "  --tree=\"MC_event\"" << endl;
+  cout << "|" << indent
+       << "  --tree=1" << endl;
+  cout << "|" << indent
        << "If nothing is specifed, this program will ask." << endl;
-
-  cout << "|" << setw( indent ) << " --except-branch : "
+  cout << "|" << indent
+       << "When you give a name of tree, correct trees are chosen" << endl;
+  cout << "|" << indent
+       << "even if structure of TFiles are not same." << endl;
+  
+  cout << "|" << setw( indent_num ) << " --except-branch : "
        << "not ready" << endl;
 
   // *** DRAW SETTING, CUT ******************************************************
   cout << "|" 
        << "=== drawing setting " << GetRepeatedWords("=", length-20 ) << endl;
 
-  cout << "|" << setw( indent ) << " --ratio : " 
+  cout << "|" << setw( indent_num ) << " --ratio : " 
        << "Ratios of histogram (hist[i]/hist[0]) are drawn" << endl;
-  cout << "|" << setw( indent ) << " --both : " 
+  cout << "|" << setw( indent_num ) << " --both : " 
        << "Both of normal histograms and rarios of histograms are drawn" << endl;
-  cout << "|" << setw( indent ) << " --cut : "
+  cout << "|" << setw( indent_num ) << " --cut : "
        << "cut is applied." << endl;
-  cout << "|" << setw( indent ) << " --rand-cut : "
+  cout << "|" << setw( indent_num ) << " --rand-cut : "
        << "not ready" << endl;
 
-  cout << "|" << setw( indent ) << " --norm : " 
+  cout << "|" << setw( indent_num ) << " --norm : " 
        << "Histgrams will be normalized." << endl;
-  cout << "|" << GetRepeatedWords( " " , indent )
+  cout << "|" << indent
        << "To specify a value of nomarization, use --norm-val" << endl;
-  cout << "|" << setw( indent ) << " --norm-val : " 
+  cout << "|" << setw( indent_num ) << " --norm-val : " 
        << "Specify a value of normalization" << endl;
 
 
-  cout << "|" << setw( indent ) << " --draw : " 
+  cout << "|" << setw( indent_num ) << " --draw : " 
        << "not ready" << endl;
 
-  cout << "|" << setw( indent ) << " --draw-ratio : " 
+  cout << "|" << setw( indent_num ) << " --draw-ratio : " 
        << "not ready" << endl;
 
-  cout << "|" << setw( indent ) << " --min-bin : "
+  cout << "|" << setw( indent_num ) << " --min-bin : "
        << "a number bins at minimum." << endl;
-  cout << "|" << setw( indent ) << " --bin-factor : " 
+  cout << "|" << setw( indent_num ) << " --bin-factor : " 
        << "factor of bin number" << endl;
 
-  cout << "|" << setw( indent ) << " --logx : " 
+  cout << "|" << setw( indent_num ) << " --logx : " 
        << "X axis is set log scale" << endl;
-  cout << "|" << setw( indent ) << " --logy : "
+  cout << "|" << setw( indent_num ) << " --logy : "
        << "Y axis is set log scale" << endl;
-  cout << "|" << setw( indent ) << " --xaxis-time : "
+  cout << "|" << setw( indent_num ) << " --xaxis-time : "
        << "not ready" << endl;
 
   // *** SPECIAL ******************************************************
@@ -437,7 +518,7 @@ void Argument::Option()
   cout << "|" 
        << "=== special " << GetRepeatedWords("=", length-12 ) << endl;
 
-  cout << "|" << setw( indent ) << " --s-cut-DY2014 : " 
+  cout << "|" << setw( indent_num ) << " --s-cut-DY2014 : " 
        << "A random trigger cut is applied to only real data." << endl;
 
 
@@ -446,24 +527,23 @@ void Argument::Option()
   cout << "|" 
        << "=== misc " << GetRepeatedWords("=", length-9 ) << endl;
 
-  cout << "|" << setw( indent ) << " --save : " 
+  cout << "|" << setw( indent_num ) << " --save : " 
        << "Specify name ( & path ) of output file. Users need to take responsibillty of path and suffix." << endl;
-  cout << "|" << setw( indent ) << " --out-dir : " 
+  cout << "|" << setw( indent_num ) << " --out-dir : " 
        << "Specify the directory which output file will be put in." << endl;
-  cout << "|" << setw( indent ) << " --option : " 
+  cout << "|" << setw( indent_num ) << " --option : " 
        << "A list of options are drawn." << endl;
-  cout << "|" << setw( indent ) << " --no-overwrite : " 
+  cout << "|" << setw( indent_num ) << " --no-overwrite : " 
        << "Progress bar is not overwritten" << endl;
 
-
   /*
-  cout << "|" << setw( indent )
+  cout << "|" << setw( indent_num )
        << " --data" << " : Specify data file like following" << endl;
-  cout << "|" << setw( indent  )
+  cout << "|" << setw( indent_num  )
        << "       " << "   --data=\"RD_all|MC_ver5_nocut\"" << endl;
-  cout << "|" << setw( indent  )
+  cout << "|" << setw( indent_num  )
        << "       " << "   Use \"show-data\" option to check available data" << endl;
-  cout << "|" << setw( indent  )
+  cout << "|" << setw( indent_num  )
        << "       " << "   You can omit directory \"data/\" , suffix \".root\" and keyword \"_UE402\"." << endl;
   */
 

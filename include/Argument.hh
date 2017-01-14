@@ -33,6 +33,7 @@ private:
   */
 
   int tree_id_ = -2;
+  vector < int > vtree_id_;
   int min_bin_num_ = -1;
 
   double norm_val_ = 1.0;
@@ -48,7 +49,8 @@ private:
   string save_;
   string specified_tree_name_ = "";
   string specified_branch_name_ = "";
-
+  string tree_name_ = "";
+  
   bool bl_same_structure_ = true;
 
   // option boolian
@@ -98,6 +100,7 @@ private:
   void ExtractTreeID();
   string ExtractSaveName();
 
+  void ShowTreeInfo();
   // interactive things
   void AskTreeID();
 public:

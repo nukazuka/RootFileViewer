@@ -21,9 +21,11 @@ void FileManager::Init()
   file_suffix_ = GetSuffix( file_name_ );
   structure_ = "";
 
+  cout << file_name_ << endl;
   tf_ = new TFile( file_full_path_.c_str(), "READ" );
   bl_exist_ = tf_->IsOpen();
-
+  bl_same_tree_structure_ = false;
+  
   if( bl_exist_ == false )
     {
       cerr << "void FileManager::Init()" << endl;
@@ -90,10 +92,56 @@ void FileManager::ExtractAllTree()
 	    }
 	}
     }
+
+  for( int i=1; i<vtr_.size(); i++ )
+    if( vtr_[0] == vtr_[i] )
+      bl_same_tree_structure_ = bl_same_tree_structure_ && true;
+    else
+      bl_same_tree_structure_ = bl_same_tree_structure_ && false;
 }
 
 
 // public functoins
+/*
+vector < string > FileManager::ExtractSameTreeName( FileManager* fm )
+{
+  vector < string > vrtn;
+
+  for( int i=0; i<vtr_.size(); i++ )
+    {
+      for( int j=0; j<fm->GetTreeNum(); j++ )
+	{
+	  cout << vtr_[i]->GetName() << " " << fm->GetTree(j)->GetName() << " ";
+	  if( (string)vtr_[i]->GetName() == fm->GetTree(j)->GetName() )
+	    {
+	      cout << "<=== taken!" << endl;;
+	      vrtn.push_back( vtr_[i]->GetName() );
+	      break;
+	    }
+	  cout << endl;
+	}
+
+    }
+
+  return vrtn;
+}
+
+vector < string > FileManager::ExtractSameTreeName( vector < FileManager* >& vfm )
+{
+
+  assert( vfm.size() > 0 );
+
+  vector < string > vrtn, vtemp;
+  for( int i=1; i<vfm.size(); i++ )
+    {
+      vtemp = vfm[0]->ExtractSameTreeName( vfm[i] );
+      copy( vtemp.begin(), vtemp.end(), back_inserter( vrtn ) );
+    }
+
+  return vrtn;
+}
+*/
+
 
 TTree* FileManager::GetTree( int tree_id )
 {
@@ -118,6 +166,19 @@ void FileManager::GetVectorTree( vector < TTree* >& vtr_arg )
 {
 
   copy( vtr_.begin(), vtr_.end(), back_inserter( vtr_arg ) );
+}
+
+bool FileManager::IsSameTreeStructure( FileManager* fm )
+{
+
+  if( this->GetTreeNum() != fm->GetTreeNum() )
+    return false;
+
+  for( int i=0; i<vtr_.size(); i++ )
+    if( vtr_[i]->GetName() != fm->GetTree(i)->GetName() )
+      return false;
+
+  return true;
 }
 
 void FileManager::Print()

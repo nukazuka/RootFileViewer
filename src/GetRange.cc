@@ -29,14 +29,16 @@ void GetRange
   TH1D* hist[num];
   for( int i=0; i<num; i++)
     {
+
       int entry = tr[i]->GetEntries( vcut[i].c_str() );
+      
       if( entry == 0 )
 	continue;
-
+      
       string hist_name = "hist" + Int2String(i);
       double max_temp = GetMaxVal( tr[i] , branch_name, vcut[i] );
       double min_temp = GetMinVal( tr[i] , branch_name, vcut[i] );
-      
+
       vmax_temp.push_back( max_temp );
       vmin_temp.push_back( min_temp );
     }
