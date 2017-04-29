@@ -6,6 +6,7 @@
 #include "TStopwatch.h"
 #include "Argument.hh"
 #include "Drawer.hh"
+#include "ConfigHandler.hh"
 
 int main( int argc, char* argv[] );
 

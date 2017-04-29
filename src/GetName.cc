@@ -44,7 +44,7 @@ void GetName( vector < TTree* >& vtr, vector < string >& vname)
   ShowVC2D( vname );
 
   // if both of real data and MC data have the name of branch, keep it
-  // loop over branched in 1st TTree
+  // loop over branche in 1st TTree
   for( unsigned int i=0; i<vvname[0].size(); i++)
     {
 
@@ -69,12 +69,10 @@ void GetName( vector < TTree* >& vtr, vector < string >& vname)
 	{
 
 	  // store this branch name anyway
-	  vname.push_back( vvname[0][i] );
+	  // vname.push_back( vvname[0][i] );
 
 	  // if this branch is array, store like :
-	  // - branch
-	  // - branch[0]
-	  // - branch[1]	  
+	  //   branch[0], branch[1], ...
 	  if( vvarray[0][i] > 1 )
 	    {
 
@@ -86,6 +84,34 @@ void GetName( vector < TTree* >& vtr, vector < string >& vname)
 			      << "[" << j << "]";
 		  vname.push_back( branch_name.str() );	  
 		}
+	    }
+	  else
+	    {
+
+	      TBranch* br = (TBranch*)vtr[0]->GetBranch( vvname[0][i].c_str() );
+
+	      string class_name = br->GetClassName();
+
+	      if( class_name == "TLorentzVector" )
+		{
+		  vname.push_back( vvname[0][i]+ ".X()" );
+		  vname.push_back( vvname[0][i]+ ".Y()" );
+		  vname.push_back( vvname[0][i]+ ".Z()" );
+		  vname.push_back( vvname[0][i]+ ".E()" );
+		  vname.push_back( vvname[0][i]+ ".Pt()" );
+		}
+	      else if( class_name == "TVector3" )
+		{
+		  vname.push_back( vvname[0][i]+ ".X()" );
+		  vname.push_back( vvname[0][i]+ ".Y()" );
+		  vname.push_back( vvname[0][i]+ ".Z()" );
+		  vname.push_back( vvname[0][i]+ ".Pt()" );
+		}
+	      else
+		{
+		  vname.push_back( vvname[0][i] );
+		}
+	      
 	    }
 	}
     }

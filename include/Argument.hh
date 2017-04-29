@@ -18,6 +18,7 @@
 #include "ArgumentParser.hh"
 #include "FileManager.hh"
 #include "misc.hh"
+#include "ConfigHandler.hh"
 
 using namespace std;
 class Argument
@@ -25,33 +26,33 @@ class Argument
 private:
 
   ArgumentParser* parser_;
-
+  ConfigHandler* config_;
+  
   /*
   int num_RD_;
   int num_MC_;
   int num_specified_;
   */
 
-  int tree_id_ = -2;
-  vector < int > vtree_id_;
+  int tree_id_     = -2;
   int min_bin_num_ = -1;
 
-  double norm_val_ = 1.0;
+  double norm_val_   = 1.0;
   double bin_factor_ = 1.0;
-  
-  string data_;
-  string data_specified_;
-  string cut_;
-  string draw_;
-  string draw_ratio_;
-  string option_;
-  string suffix_;
-  string save_;
-  string specified_tree_name_ = "";
+
+  string data_			= "";
+  string data_specified_	= "";
+  string cut_			= "";
+  string draw_			= "";
+  string draw_ratio_		= "";
+  string option_		= "";
+  string suffix_		= "";
+  string save_			= "";
+  string specified_tree_name_	= "";
   string specified_branch_name_ = "";
-  string tree_name_ = "";
+  string tree_name_		= "";
   
-  bool bl_same_structure_ = true;
+  bool bl_same_structure_	= true;
 
   // option boolian
   bool bl_force_	= false;
@@ -86,13 +87,19 @@ private:
 
   vector < string > vfile_;
   //  vector < Int_t > vcolors_;
-  vector < int > vcolors_;
+  vector < int >    vtree_id_;
+  vector < int >    vcolors_;
   vector < string > vtags_;
   vector < string > vcut_;
 
   vector < FileManager* > vfm_;
-    
+
+  // variables added for ConfigHandler //////////////////////////
+  string config_path_ = "" ;
+  string mode_        = "" ;
+  
   void   Init();
+  void   InitWithConfigFile();
 
   bool CheckFileStructure();
   void ExtractCut();
@@ -109,8 +116,10 @@ public:
   ~Argument			();
   void Option			();
 
-  void GetVectorTree		( vector < TTree* >& vtr_arg );
-  void GetVectorCut		( vector < string >& vcut_arg );
+  ConfigHandler* GetConfigHandler(){ return config_;};
+  vector < TTree* > GetVectorTree();
+  //  vector < string >  GetVectorCut(){ return vcut_ ;};
+  vector < string >  GetVectorCut();
   double GetBinFactor           (){ return bin_factor_;};
   string GetDrawOption		(){ return draw_;};
   string GetDrawRatioOption	(){ return draw_ratio_;};
@@ -120,7 +129,7 @@ public:
   double GetNormVal		(){ return norm_val_;};
   int    GetMinBin		(){ return min_bin_num_;};
 
-  // checking option 
+  // checking option
   bool IsForce			(){ return bl_force_        ;};
   bool IsPrint			(){ return bl_print_        ;};
   bool IsLogx			(){ return bl_logx_         ;};
@@ -136,5 +145,10 @@ public:
   bool IsNoOverwrite		(){ return bl_no_overwrite_ ;};
 
   void ShowStatus		();
+
+  // functions added for ConfigHandler //////////////////////////////////////
+  bool IsConfigure              (){ return parser_->IsSpecified( "config" );};
+  string GetMode                (){ return mode_;};
+  
 };
 #endif
