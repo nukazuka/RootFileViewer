@@ -10,6 +10,12 @@ Argument::Argument(int argc, char* argv[] )
   if( parser_->IsSpecified( "option" ) )
     Option();
 
+  if( parser_->IsSpecified( "config-template" ) )
+    {
+      ConfigHandler::GiveConfigTemplate( "template.config" );
+      exit(1);
+    }
+
   Init();
   if( vfile_.size() == 0 )
     {
@@ -25,8 +31,16 @@ Argument::Argument(int argc, char* argv[] )
 void Argument::Init()
 {
 
+  if( parser_->IsSpecified( "config" ) == true )
+    {
+      InitWithConfigFile();
+      return;
+    }
+
   data_ = parser_->GetArgument( "data" );
 
+  
+  
   ExtractFileName();
 
   // get flag
@@ -99,6 +113,7 @@ void Argument::Init()
 
   IsTree() ? ExtractTreeID() : AskTreeID();
 
+  cout << tree_id_ << endl;
   cout << vfm_[0]->GetTree( tree_id_ )->GetName() << " is used." << endl;
 
   if( save_ == "none" )
@@ -122,6 +137,43 @@ bool Argument::CheckFileStructure()
     }
 
   return true;
+}
+
+void Argument::InitWithConfigFile()
+{
+
+  config_path_ = parser_->GetArgument( "config" );  
+  config_ = new ConfigHandler( config_path_ );
+  vfile_ = config_->GetData();
+  vcut_  = config_->GetCuts();
+  
+  save_ = config_->GetOutputPath();
+  if( save_ == "" )
+    save_ = ExtractSaveName();
+  
+  bl_norm_ = config_->IsNorm();
+  bl_logx_ = config_->IsLogx();
+  bl_logy_ = config_->IsLogx();
+  //  bl_logz_ = config_->IsLogx();
+
+  mode_ = config_->GetMode();
+  if( mode_ == "ratio" )
+    bl_ratio_ = true;
+  else if( mode_ == "both" )
+    bl_both_ = true;
+
+  tree_name_ = config_->GetTreeName();
+  specified_tree_name_ = tree_name_;
+  
+  // make a vector of FileManager
+  for( unsigned int i=0; i<vfile_.size(); i++ )
+    vfm_.push_back( new FileManager( vfile_[i] , !IsTree() ) );
+  
+  //  IsTree() ? ExtractTreeID() : AskTreeID();
+  tree_name_  != "" ? ExtractTreeID() : AskTreeID();
+
+  cout << vfm_[0]->GetTree( vtree_id_[0] )->GetName() << " is used." << endl;
+  
 }
 
 void Argument::ExtractCut()
@@ -177,53 +229,79 @@ void Argument::ExtractFileName()
 void Argument::ExtractTreeID()
 {
 
+  // if specified tree name is number,
+  // the number is applied to all TTree
   if( IsNumber( specified_tree_name_ ) )
     {
 
+      // get id
       int id = String2Int( specified_tree_name_ );
+
+      // if id is valid, store it
       if( id > -1 && id < vfm_[0]->GetTreeNum() )
-	tree_id_ = id;
+
+	//	tree_id_ = id;
+	for( int i=0; i<vfile_.size(); i++ )
+	  vtree_id_.push_back( id );
+
+      return;
     }
+  // if specified tree name is not number,
+  // id number of the tree in each file is searched and stored
   else
     {
-      for( int i=0; i<vfm_[0]->GetTreeNum(); i++ )
-      	{	  
+  //     for( int i=0; i<vfm_[0]->GetTreeNum(); i++ )
+  //     	{	  
 
-      	  if( specified_tree_name_ == vfm_[0]->GetTree(i)->GetName() )
-      	    {
-      	      tree_id_ = i;
-      	    }
-      	}
-    }
+  //     	  if( specified_tree_name_ == vfm_[0]->GetTree(i)->GetName() )
+  //     	    {
+  //     	      tree_id_ = i;
+  //     	    }
+  //     	}
+  //   }
 
   
-  /////////////////////////////////////////
-  // vector version
-  for( int i=0; i<vfile_.size(); i++ )
-    {
+  // /////////////////////////////////////////
+  // // vector version
+  // for( int i=0; i<vfile_.size(); i++ )
+  //   {
 
-      for( int j=0; j<vfm_[i]->GetTreeNum(); j++ )
+  //     for( int j=0; j<vfm_[i]->GetTreeNum(); j++ )
+  // 	{
+
+  // 	  if( IsNumber( specified_tree_name_ ) )
+  // 	    {
+  // 	      int id = String2Int( specified_tree_name_ );
+  // 	      if( id > -1 && id < vfm_[0]->GetTreeNum() )
+  // 		vtree_id_.push_back( id );
+  // 	    }	  
+  // 	    else if( specified_tree_name_ == (string)(vfm_[i]->GetTree(j)->GetName()) )
+  // 	    {
+
+  // 	      vtree_id_.push_back(j);
+  // 	      break;
+
+      for( int i=0; i<vfile_.size(); i++ )
 	{
-
-	  if( IsNumber( specified_tree_name_ ) )
+	  for( int j=0; j<vfm_[i]->GetTreeNum(); j++ )
 	    {
-	      int id = String2Int( specified_tree_name_ );
-	      if( id > -1 && id < vfm_[0]->GetTreeNum() )
-		vtree_id_.push_back( id );
-	    }	  
-	    else if( specified_tree_name_ == (string)(vfm_[i]->GetTree(j)->GetName()) )
-	    {
-
-	      vtree_id_.push_back(j);
-	      break;
+	      if( specified_tree_name_ == (string)(vfm_[i]->GetTree(j)->GetName()) )
+		{
+		  vtree_id_.push_back(j);
+		  break;
+		}
 	    }
 	}
     }
 
-
-  //  cout << "ExtractTreeID" << endl;
-  //  cout << "size of vtree_id_ : " << vtree_id_.size() << endl;
-  //  cout << vtree_id_[0] << endl;
+  // if no id was found, stop!
+  if( vtree_id_.size() == 0 )
+    {
+      cerr << " void Argument::ExtractTreeID()" << endl;
+      cerr << " a number of tree id found is 0" << endl;
+      cerr << " check whether tree name is correct or not" << endl;
+      exit( -1 );
+    }  
 }
 
 // output name is :
@@ -365,14 +443,16 @@ void Argument::ShowTreeInfo()
       vfm_[0]->ShowTree();
     }
   else
-    for( int i=0; i<vfm_.size(); i++ )
-      {
-	//	  string stemp( "-" , vfm_[i]->GetName().size() );
-	string stemp( vfm_[i]->GetName().size() , '-');
-	cout << stemp << endl;
-	cout << vfm_[i]->GetName() << endl;
-	vfm_[i]->ShowTree();
-      }
+    {
+      for( int i=0; i<vfm_.size(); i++ )
+	{
+	  //	  string stemp( "-" , vfm_[i]->GetName().size() );
+	  string stemp( vfm_[i]->GetName().size() , '-');
+	  cout << stemp << endl;
+	  cout << vfm_[i]->GetName() << endl;
+	  vfm_[i]->ShowTree();
+	}
+    }
   
   //  vector < string > vsame_name = FileManager::ExtractSameTreeName( vfm_ );
 
@@ -392,31 +472,39 @@ void Argument::ShowTreeInfo()
 
 // public functions
 
-void Argument::GetVectorTree( vector < TTree* >& vtr_arg )
+vector < TTree* > Argument::GetVectorTree()
 {
 
-  //  for( unsigned int i=0; i<vfm_.size(); i++ )
-  //    vtr_arg.push_back( vfm_[i]->GetTree( tree_id_ ) );
-
-  //  cout << "void Argument::GetVectorTree( vector < TTree* >& vtr_arg )" << endl;
-  //  cout << vtree_id_[0] << endl;
-  
-  for( int i=0; i<vfm_.size(); i++ )
-    cout << i << " "
-	 << vfm_[i]->GetName() << " "
-	 << vtree_id_[i]
-	 << endl;
-  
-  // vector version
+  vector < TTree* > vtr;
   for( unsigned int i=0; i<vfm_.size(); i++ )
-    vtr_arg.push_back( vfm_[i]->GetTree( vtree_id_[i] ) );
+    vtr.push_back( vfm_[i]->GetTree( vtree_id_[i] ) );
+
+  return vtr;
 }
 
-void Argument::GetVectorCut( vector < string >& vcut_arg )
+vector < string > Argument::GetVectorCut()
 {
 
-  copy( vcut_.begin(), vcut_.end(), back_inserter( vcut_arg ) );
+  if( vcut_.size() == 0 )
+    return vector < string > ( vfile_.size() , "" );
+
+  if( config_->IsEachCut() == false )
+    {
+
+      string cut_common = vcut_[0];
+      for( int i=1; i<vcut_.size(); i++ )
+	cut_common += " && " + vcut_[i];
+
+      return vector < string > ( vfile_.size() , cut_common );
+    }
+
+  // each cut mode should be implemented ... ...   
+  // dummy vector and rtn
+  vector < string > vrtn;
+  return vrtn;
 }
+
+
 
 string Argument::GetFileName( int num )
 {
@@ -447,13 +535,19 @@ void Argument::Option()
 {
 
   int length = 80;
-  int indent_num = 20;
+  int indent_num = 25;
   string indent( indent_num , ' ' );
   cout << endl;
   cout << "--OPTIONS"
        << GetRepeatedWords( "-", length-8 ) << endl;
 
-  // --data
+  // *** CONFIGURE ******************************************************
+  cout << "|" << setw( indent_num ) << " --config : "
+       << "You can specify configuration file" << endl;
+  cout << "|" << setw( indent_num ) << " --config-template : "
+       << "A template of configuration \"template.config\" is " << endl;
+  cout << "|" << setw( indent_num ) << " : " << "output and program is exited" << endl;
+
   // *** DATA SELECTION ******************************************************
   cout << "|" << setw( indent_num ) << " --data : "
        << "You can specify data like following:" << endl;
@@ -567,72 +661,3 @@ void Argument::Option()
 
   exit(1);
 }
-
-/*
-void Argument::ShowDataFile()
-{
-
-  vector < string > vfile;
-  vector < int > vlength;
-  string dir_name = "data/";
-  DIR* dp = opendir( dir_name.c_str() );
-  if( dp == NULL)
-    {
-      cout << "=== ERROR ====" << endl;
-      cout << "where is data directory?" << endl;
-      cout << "plase go to parent directory of data" << endl;
-      exit( -1 );
-    }
-  else
-    {
-
-      struct dirent* dent;
-
-      do
-	{
-
-	  dent = readdir( dp );
-	  if( dent != NULL )
-	    {
-
-	      string name = dent->d_name;
-	      vlength.push_back( name.size() );
-	      if( name.find( ".root" )  != string::npos )
-		vfile.push_back( dir_name + name );
-	    }
-	} while(dent!=NULL);
-
-      closedir(dp);
-    }
-  
-  sort( vfile.begin() , vfile.end() );
-  int longest = *max_element( vlength.begin(), vlength.end() );
-  int width_base = longest*2 + 3*2 + 1;
-
-  cout << GetRepeatedWords( "=" , width_base  ) << endl;
-
-  string comment = "  A List Of Data Files";
-
-  cout << "|" << comment << GetRepeatedWords( " " , width_base - comment.size() -2 ) << "|" << endl;
-  cout << "|" << GetRepeatedWords( "-" , width_base - 2 ) << "|" <<  endl;
-
-  for( int i=0; i<vfile.size(); i++ )
-    {
-
-      if( i%2 == 0 )
-	cout << "| " ;
-
-      cout << setw( longest ) << left << Replace( vfile[i], "data/", "" ) 
-	   << " | ";
-
-      if( i%2 == 1 )
-	cout << endl;
-    }
-
-  if( vfile.size() % 2 == 1 )
-    cout << GetRepeatedWords( " " , longest+1) <<  "|" << endl;
-
-  cout << GetRepeatedWords( "=" , width_base ) << endl;
-  exit(1);
-}
-*/

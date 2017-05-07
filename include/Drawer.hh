@@ -16,9 +16,12 @@ class Drawer
 {
 private:
   Argument* arg_;
+  ConfigHandler* config_;
+  
   vector < TTree* > vtr_;
   vector < string > vcut_;
   vector < string > vbranch_name_;
+  vector < string > vexpression_;
   TCanvas* c_;
 
   int    branch_num_;
@@ -35,7 +38,7 @@ private:
 
   void GetVectorHist( string branch_name,vector < TH1D* >& vhist );
   TH1D* GetHist( int num, string file_name, TTree* tr, string branch_name, string cut, int bin, double xmin, double xmax );
-  
+
   void SetHist( TH1D* hist, int num );
 public:
 

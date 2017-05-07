@@ -6,15 +6,17 @@ Drawer::Drawer( Argument* arg )
 {
 
   arg_ = arg;
+  cout << " before Init" << endl;
   Init();
   
   c_->Print( (save_+"[").c_str() );
-  DrawInfo();
+  //  DrawInfo(); // to be fixed later
 
+  cout << " before Draw" << endl;
   Draw();
 
   c_->Print( (save_+"]").c_str() );
-
+  
 }
 
 
@@ -24,15 +26,19 @@ Drawer::Drawer( Argument* arg )
 void Drawer::Init()
 {
 
+  if( arg_->IsConfigure() == true )
+    config_ = arg_->GetConfigHandler();
+
   // making canvas
-  if( arg_->IsBoth() == true )
+  if( arg_->GetMode() == "both" )
     c_ = GetCanvas( "canvas", "comparison", false);
   else
     c_ = GetCanvas( "canvas", "square", false );
 
   save_ = arg_->GetSaveName();
-  arg_->GetVectorTree( vtr_ );
-  arg_->GetVectorCut( vcut_ );
+  vtr_  = arg_->GetVectorTree();
+  vcut_ = arg_->GetVectorCut();
+
   GetName( vtr_, vbranch_name_ );
 
   //  ShowVC( vbranch_name_ );
@@ -116,8 +122,11 @@ void Drawer::Draw()
   if( arg_->IsNoOverwrite() )
     carrige_return = "\n";
 
-  for( int i=0; i<branch_num_; i++ )
-    //for( int i=0; i<1; i++ )
+  int loop_num = branch_num_;
+  if( arg_->GetMode() == "test" )
+    loop_num = 1;
+  
+  for( int i=0; i<loop_num; i++ )
     {
 
       string bar = GetRepeatedWords( "=" , 2 * 10 * i / branch_num_ ) + ">";
@@ -126,20 +135,12 @@ void Drawer::Draw()
 	   << setw(20) << left << bar
 	   << "] "
 	   << setw(5) << setprecision(4) << right 
-	   << 1.*i / branch_num_ * 100 << " %";
-
-      string branch_name_corrected
-	= vbranch_name_[i].substr( 0 , vbranch_name_[i].find( "[" ) );
-      
-      TBranch* br = (TBranch*)vtr_[0]->GetBranch( branch_name_corrected.c_str() );
-      string class_name = br->GetClassName();
-
-      if( class_name != "" )
-	continue;
+	   << 1.*i / branch_num_ * 100 << "%"
+	   << "\t" << vbranch_name_[i] << "                 ";
 
       vector < TH1D* > vhist;
       GetVectorHist( vbranch_name_[i], vhist );
-
+      
       if( arg_->IsBoth() )
 	{
 	  c_ = GetCanvas( "canvas", "comparison", false);
@@ -177,7 +178,7 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
 
   TGaxis::SetMaxDigits(3);
 
-  MultiHist* mh = new MultiHist( branch_name , branch_name );
+  MultiHist* mh = new MultiHist( branch_name , branch_name, vhist );
   mh->SetMargins( 0 );
   mh->SetMarginTop( 0.15 );
   mh->SetDrawNoEntry( true );
@@ -188,11 +189,7 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
       gPad->SetLogx( arg_->IsLogx() );
       gPad->SetLogy( arg_->IsLogy() );
 
-      string option = arg_->GetDrawOption();
-
-      for( unsigned int i=0; i<vtr_.size(); i++ )
-	mh->Add( vhist[i] );
-
+      string option = arg_->GetConfigHandler()->GetDrawOption();
       mh->Draw( option , 0.90, 0.9 - 0.1*vtr_.size() , 1.0, 0.9 );
 
     }
@@ -213,29 +210,34 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
       mh_ratio->SetRatioMode( true );
       mh_ratio->SetIncludeErrorBar( true );
       mh_ratio->SetDrawNoEntry( true );
-
-      TH1D* htemp[vtr_.size()];
-      htemp[0] = (TH1D*)vhist[0]->Clone();
-      htemp[0]->Scale( 1.0 / htemp[0]->Integral() );
+      mh_ratio->SetYmax( 2.0 );
+      mh_ratio->SetRatioNormalize( true );
+      
+      mh_ratio->AddBaseHist( vhist[0] );
+      
+      //      TH1D* htemp[vtr_.size()];
+      //      htemp[0] = (TH1D*)vhist[0]->Clone();
+      //      htemp[0]->Scale( 1.0 / htemp[0]->Integral() );
 
       string option = arg_->GetDrawRatioOption();
 
       for( unsigned int i=1; i<vtr_.size(); i++ )
 	{
 
-	  htemp[i] = (TH1D*)vhist[i]->Clone();
-	  htemp[i]->Scale( 1.0 / htemp[i]->Integral() );
+	  //	  htemp[i] = (TH1D*)vhist[i]->Clone();
+	  //	  htemp[i]->Scale( 1.0 / htemp[i]->Integral() );
 
-	  if( gPad->GetCanvasID() > 1 )
-	    htemp[i]->SetTitle( "Ratio" );
-	  else
-	    htemp[i]->SetTitle( ((string)vhist[i]->GetTitle() + " ratio" ).c_str() );
+	  // if( gPad->GetCanvasID() > 1 )
+	  //   htemp[i]->SetTitle( "Ratio" );
+	  // else
+	  //   htemp[i]->SetTitle( ((string)vhist[i]->GetTitle() + " ratio" ).c_str() );
 
-	  htemp[i]->SetLineWidth( 1 );
-	  htemp[i]->SetMarkerStyle(7);
+	  //	  htemp[i]->SetLineWidth( 1 );
+	  //	  htemp[i]->SetMarkerStyle(7);
 
-	  htemp[i]->Divide( htemp[0] );
-	  mh_ratio->Add( htemp[i] );
+	  //	  htemp[i]->Divide( htemp[0] );
+	  //	  mh_ratio->Add( htemp[i] );
+	  mh_ratio->Add( vhist[i] );
 	}
       
       // trick to get same frame, should be improved
@@ -258,6 +260,7 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
 
   double xmin = 0.0, xmax = 1.0;
   GetRange( vtr_, branch_name, vcut_, xmin, xmax);
+  
   // set a number of bin
   //  int bin = xmax - xmin; // not good
   int bin = sqrt( vtr_[0]->GetEntries( vcut_[0].c_str() ) ) * arg_->GetBinFactor();
@@ -361,8 +364,9 @@ void Drawer::SetHist( TH1D* hist, int num )
 
   if( num < 10 )
     {
-      hist->SetLineColor( kColor_[num] );
-      hist->SetMarkerColor( kColor_[num] );
+      //      hist->SetLineColor( kColor_[num] );
+      //      hist->SetMarkerColor( kColor_[num] );
+      HistSetting( hist , GetColor(num) , 2 );
     }
   else
     {
