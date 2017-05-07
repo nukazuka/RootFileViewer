@@ -22,6 +22,7 @@ using namespace std;
   @fn void GetName(  vector < TTree* >& tr, vector < string >& vname);
   @brief get branch names which are common between all TTrees
 */
-void GetName(  vector < TTree* >& tr, vector < string >& vname);
+//void GetName(  vector < TTree* >& tr, vector < string >& vname);
+vector < string > GetName(  vector < TTree* >& tr );
 
 #endif

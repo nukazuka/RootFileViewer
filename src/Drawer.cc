@@ -6,20 +6,15 @@ Drawer::Drawer( Argument* arg )
 {
 
   arg_ = arg;
-  cout << " before Init" << endl;
   Init();
-
+  
   c_->Print( (save_+"[").c_str() );
   //  DrawInfo(); // to be fixed later
-
-  cout << " before Draw" << endl;
   Draw();
 
   c_->Print( (save_+"]").c_str() );
   
 }
-
-
 
 // private function
 
@@ -39,7 +34,30 @@ void Drawer::Init()
   vtr_  = arg_->GetVectorTree();
   vcut_ = arg_->GetVectorCut();
 
-  GetName( vtr_, vbranch_name_ );
+  //  GetName( vtr_, vbranch_name_ );
+  if( arg_->GetConfigHandler()->GetBranchName().size() == 0 )
+    {
+      vbranch_name_ = GetName( vtr_ );
+      
+      vector < string > vbranch_except;
+      // if some branches should be ignored
+      if( arg_->GetConfigHandler()->GetBranchExcept().size() != 0 )
+	{
+
+	  vbranch_except = arg_->GetConfigHandler()->GetBranchExcept();
+	  
+	  for( int i=0; i<vbranch_except.size(); i++ )
+	    vbranch_name_.erase( remove( vbranch_name_.begin() ,vbranch_name_.end() , vbranch_except[i]) , vbranch_name_.end() );
+
+	}
+      
+    }
+  else
+    {
+      vbranch_name_ = arg_->GetConfigHandler()->GetBranchName();
+      vbranch_config_ = arg_->GetConfigHandler()->GetBranchConfig();
+    }
+
   //  ShowVC( vbranch_name_ );
 
   if( arg_->IsTest() )
@@ -111,12 +129,6 @@ void Drawer::DrawInfo()
 void Drawer::Draw()
 {
 
-  cout << "cut:" << endl;
-  if( vcut_[0].size() == 0 )
-    cout << "\e[A" << "cut: " << "Nothig!!!" << endl;
-  else
-    ShowVC( vcut_ );
-
   string carrige_return = "\r";
   if( arg_->IsNoOverwrite() )
     carrige_return = "\n";
@@ -138,7 +150,15 @@ void Drawer::Draw()
 	   << "\t" << vbranch_name_[i] << "                 ";
 
       vector < TH1D* > vhist;
-      GetVectorHist( vbranch_name_[i], vhist );
+
+      BranchConfig* branch_config = new BranchConfig();
+      if( arg_->GetConfigHandler()->GetBranchConfig().size() != 0 )
+	branch_config = arg_->GetConfigHandler()->GetBranchConfig()[i];
+      
+      if( branch_config->bin_ == -1 )
+	branch_config = MakeBranchConfig( vbranch_name_[i] );
+
+      vhist = GetVectorHist( branch_config );
       
       if( arg_->IsBoth() )
 	{
@@ -167,6 +187,7 @@ void Drawer::Draw()
 
     }
 
+  cout << endl;
   cout << "\r" << " [" << GetRepeatedWords("=", 20) << "] 100% Finished !\n" << endl;
 }
 
@@ -180,7 +201,10 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
   MultiHist* mh = new MultiHist( branch_name , branch_name, vhist );
   mh->SetMargins( 0 );
   mh->SetMarginTop( 0.15 );
+  mh->SetMarginLeft( 0.15 );
+  mh->SetMarginRight( 0.15 );
   mh->SetDrawNoEntry( true );
+  mh->SetStatsBoxPoint( 0.9 , 0.85 );
 
   if( ratio == false )
     {
@@ -210,34 +234,17 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
       mh_ratio->SetIncludeErrorBar( true );
       mh_ratio->SetDrawNoEntry( true );
       mh_ratio->SetYmax( 2.0 );
+      mh_ratio->SetYmin( 0.0 );
       mh_ratio->SetRatioNormalize( true );
+      mh_ratio->SetLabelSizeX( 0.13 );
+      mh_ratio->SetLabelSizeY( 0.08 );
       
       mh_ratio->AddBaseHist( vhist[0] );
       
-      //      TH1D* htemp[vtr_.size()];
-      //      htemp[0] = (TH1D*)vhist[0]->Clone();
-      //      htemp[0]->Scale( 1.0 / htemp[0]->Integral() );
-
       string option = arg_->GetDrawRatioOption();
 
       for( unsigned int i=1; i<vtr_.size(); i++ )
-	{
-
-	  //	  htemp[i] = (TH1D*)vhist[i]->Clone();
-	  //	  htemp[i]->Scale( 1.0 / htemp[i]->Integral() );
-
-	  // if( gPad->GetCanvasID() > 1 )
-	  //   htemp[i]->SetTitle( "Ratio" );
-	  // else
-	  //   htemp[i]->SetTitle( ((string)vhist[i]->GetTitle() + " ratio" ).c_str() );
-
-	  //	  htemp[i]->SetLineWidth( 1 );
-	  //	  htemp[i]->SetMarkerStyle(7);
-
-	  //	  htemp[i]->Divide( htemp[0] );
-	  //	  mh_ratio->Add( htemp[i] );
-	  mh_ratio->Add( vhist[i] );
-	}
+	mh_ratio->Add( vhist[i] );
       
       // trick to get same frame, should be improved
       for( unsigned int i=0; i<vtr_.size(); i++ )
@@ -310,6 +317,27 @@ void Drawer::GetVectorHist( string branch_name, vector < TH1D* >& vhist )
       }
 }
 
+vector < TH1D* > Drawer::GetVectorHist( BranchConfig* branch_config )
+{
+
+  vector < TH1D* > vhist;
+  for( unsigned int i=0; i<vtr_.size(); i++ )
+    {
+
+      vhist.push_back( GetHist( i,
+				arg_->GetFileName(i),
+				vtr_[i], 
+				branch_config->name_, 
+				vcut_[i],
+				branch_config->bin_, 
+				branch_config->xmin_, 
+				branch_config->xmax_
+				)
+		       );
+    }
+  return vhist;
+}
+
 TH1D* Drawer::GetHist( int num, string file_name, TTree* tr, string branch_name, string cut, int bin, double xmin, double xmax )
 {
 
@@ -353,6 +381,33 @@ TH1D* Drawer::GetHist( int num, string file_name, TTree* tr, string branch_name,
     }
 
   return hist;
+}
+
+BranchConfig* Drawer::MakeBranchConfig( string branch_name )
+{
+
+  double xmin = 0.0, xmax = 1.0;
+  GetRange( vtr_, branch_name, vcut_, xmin, xmax);
+
+  // set a number of bin
+  //  int bin = xmax - xmin; // not good
+  int bin = sqrt( vtr_[0]->GetEntries( vcut_[0].c_str() ) ) * arg_->GetBinFactor();
+  
+  // if this branch is boolian, change #bin, xmin and xmax
+  string branch_name_corrected
+    = branch_name.substr( 0 , branch_name.find( "[" ) );
+
+  TLeaf* leaf = vtr_[0]->GetLeaf( branch_name_corrected.c_str() );
+
+  if( leaf != nullptr )
+    if( (string)leaf->GetTypeName() == "Bool_t" )
+      {
+	bin  = 2;
+	xmin = 0;
+	xmax =2;
+	
+      }
+  return new BranchConfig( branch_name , bin, xmin, xmax );
 }
 
 void Drawer::SetHist( TH1D* hist, int num )

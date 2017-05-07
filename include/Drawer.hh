@@ -22,6 +22,8 @@ private:
   vector < string > vcut_;
   vector < string > vbranch_name_;
   vector < string > vexpression_;
+  vector < BranchConfig* > vbranch_config_;
+  
   TCanvas* c_;
 
   int    branch_num_;
@@ -36,10 +38,15 @@ private:
   void DrawInfo();
   void DrawPad( TVirtualPad* pad, vector < TH1D* >& vhist, string branch_name, bool ratio);
 
-  void GetVectorHist( string branch_name,vector < TH1D* >& vhist );
+  void GetVectorHist( string branch_name,vector < TH1D* >& vhist ); // obsolete
+  vector < TH1D* >  GetVectorHist( BranchConfig* branch_config );
+  
   TH1D* GetHist( int num, string file_name, TTree* tr, string branch_name, string cut, int bin, double xmin, double xmax );
 
+  BranchConfig* MakeBranchConfig( string branch_name );
   void SetHist( TH1D* hist, int num );
+
+  
 public:
 
   Drawer( Argument* arg );

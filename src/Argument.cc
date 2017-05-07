@@ -12,11 +12,25 @@ Argument::Argument(int argc, char* argv[] )
 
   if( parser_->IsSpecified( "config-template" ) )
     {
-      ConfigHandler::GiveConfigTemplate( "template.config" );
+
+      string data_path = parser_->GetArgument( "config-template" );
+      string tr_name   = parser_->GetArgument( "tree" );
+
+      if( data_path != "NULL" && tr_name != "NULL" )
+	{
+	  ConfigHandler::GiveConfigTemplate( data_path , tr_name );
+	}
+      else
+	{
+	  cerr << "  config option ON but data path and/or tree name are not given" << endl;
+	  ConfigHandler::GiveConfigTemplate();
+	}
+
       exit(1);
     }
 
   Init();
+			     
   if( vfile_.size() == 0 )
     {
       cerr << "No data file " << endl;
@@ -38,8 +52,6 @@ void Argument::Init()
     }
 
   data_ = parser_->GetArgument( "data" );
-
-  
   
   ExtractFileName();
 
@@ -143,37 +155,34 @@ void Argument::InitWithConfigFile()
 {
 
   config_path_ = parser_->GetArgument( "config" );  
+
   config_ = new ConfigHandler( config_path_ );
-  vfile_ = config_->GetData();
-  vcut_  = config_->GetCuts();
-  
+
+  vfile_		= config_->GetData();
+  vcut_			= config_->GetCuts();
+  bl_norm_		= config_->IsNorm();
+  bl_logx_		= config_->IsLogx();
+  bl_logy_		= config_->IsLogy();
+  //  bl_logz_		= config_->IsLogz();
+  tree_name_		= config_->GetTreeName();
+  specified_tree_name_	= tree_name_;
+
   save_ = config_->GetOutputPath();
   if( save_ == "" )
     save_ = ExtractSaveName();
   
-  bl_norm_ = config_->IsNorm();
-  bl_logx_ = config_->IsLogx();
-  bl_logy_ = config_->IsLogx();
-  //  bl_logz_ = config_->IsLogx();
-
   mode_ = config_->GetMode();
   if( mode_ == "ratio" )
     bl_ratio_ = true;
   else if( mode_ == "both" )
     bl_both_ = true;
 
-  tree_name_ = config_->GetTreeName();
-  specified_tree_name_ = tree_name_;
-  
   // make a vector of FileManager
   for( unsigned int i=0; i<vfile_.size(); i++ )
     vfm_.push_back( new FileManager( vfile_[i] , !IsTree() ) );
-  
+
   //  IsTree() ? ExtractTreeID() : AskTreeID();
   tree_name_  != "" ? ExtractTreeID() : AskTreeID();
-
-  cout << vfm_[0]->GetTree( vtree_id_[0] )->GetName() << " is used." << endl;
-  
 }
 
 void Argument::ExtractCut()
@@ -484,13 +493,35 @@ string Argument::GetFileName( int num )
 void Argument::ShowStatus()
 {
 
-  cout << "Data File: ";
+  cout << "  - Data File: ";
   for( unsigned int i=0; i<vfm_.size(); i++ )
     cout << vfm_[i]->GetName() << "\t";
   cout << endl;
   
-  cout << "Save file: " << GetSaveName() << endl;
+  cout << "  - Save file: "
+       << GetSaveName() << endl;
+  cout << "  - TTree : "
+       << vfm_[0]->GetTree( vtree_id_[0] )->GetName() << " is used." << endl;
+  
+  // vector < string > vbranch_name = config_->GetBranchName();
+  // if( vbranch_name.size() > 0 )
+  //   {
+  //     cout << "  - name of branch to be drawn : " << endl;
+  //     for( int i=0; i<vbranch_name.size(); i++ )
+  // 	{
+  // 	  cout << "    "
+  // 	       << setw(20) << vbranch_name[i]
+  // 	       << " ";
 
+  // 	  if( i%2 == 1 )
+  // 	    cout << endl;
+  // 	}
+  //     cout << endl;
+  //   }
+
+  config_->Print();
+  
+  
   //  cout << GetRepeatedWords( "*", 10 ) << endl;
   //  cout << GetRepeatedWords( "*", 10 ) << endl;
 }
@@ -513,6 +544,8 @@ void Argument::Option()
   cout << "|" << setw( indent_num ) << " --config-template : "
        << "A template of configuration \"template.config\" is " << endl;
   cout << "|" << setw( indent_num ) << " : " << "output and program is exited" << endl;
+  cout << "|" << setw( indent_num ) << " : " << "Root file to be drawn is optional." << endl;
+  cout << "|" << setw( indent_num ) << " : " << "Name of TTree to be drawn need to be given with --tree option" << endl;
 
   // *** DATA SELECTION ******************************************************
   cout << "|" << setw( indent_num ) << " --data : "
