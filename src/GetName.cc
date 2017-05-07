@@ -4,9 +4,12 @@ using namespace std;
 // get name of branches which are common both tr1 and tr2
 
 // naive mode
-void GetName( vector < TTree* >& vtr, vector < string >& vname)
+//void GetName( vector < TTree* >& vtr, vector < string >& vname)
+vector < string > GetName( vector < TTree* >& vtr )
 {
-
+  
+  vector < string > vname;
+  
   const int num = vtr.size();
   if( num == 0 )
     {
@@ -115,4 +118,6 @@ void GetName( vector < TTree* >& vtr, vector < string >& vname)
 	    }
 	}
     }
+
+  return vname;
 }
