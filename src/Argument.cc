@@ -179,11 +179,10 @@ void Argument::ExtractTreeID()
 
   if( IsNumber( specified_tree_name_ ) )
     {
+
       int id = String2Int( specified_tree_name_ );
       if( id > -1 && id < vfm_[0]->GetTreeNum() )
 	tree_id_ = id;
-
-      return;
     }
   else
     {
@@ -193,25 +192,38 @@ void Argument::ExtractTreeID()
       	  if( specified_tree_name_ == vfm_[0]->GetTree(i)->GetName() )
       	    {
       	      tree_id_ = i;
-      	      //	      return;
       	    }
       	}
     }
 
+  
   /////////////////////////////////////////
   // vector version
   for( int i=0; i<vfile_.size(); i++ )
     {
+
       for( int j=0; j<vfm_[i]->GetTreeNum(); j++ )
 	{
-	  if( specified_tree_name_ == (string)(vfm_[i]->GetTree(j)->GetName()) )
+
+	  if( IsNumber( specified_tree_name_ ) )
 	    {
+	      int id = String2Int( specified_tree_name_ );
+	      if( id > -1 && id < vfm_[0]->GetTreeNum() )
+		vtree_id_.push_back( id );
+	    }	  
+	    else if( specified_tree_name_ == (string)(vfm_[i]->GetTree(j)->GetName()) )
+	    {
+
 	      vtree_id_.push_back(j);
 	      break;
 	    }
 	}
     }
 
+
+  //  cout << "ExtractTreeID" << endl;
+  //  cout << "size of vtree_id_ : " << vtree_id_.size() << endl;
+  //  cout << vtree_id_[0] << endl;
 }
 
 // output name is :
@@ -386,6 +398,9 @@ void Argument::GetVectorTree( vector < TTree* >& vtr_arg )
   //  for( unsigned int i=0; i<vfm_.size(); i++ )
   //    vtr_arg.push_back( vfm_[i]->GetTree( tree_id_ ) );
 
+  //  cout << "void Argument::GetVectorTree( vector < TTree* >& vtr_arg )" << endl;
+  //  cout << vtree_id_[0] << endl;
+  
   for( int i=0; i<vfm_.size(); i++ )
     cout << i << " "
 	 << vfm_[i]->GetName() << " "

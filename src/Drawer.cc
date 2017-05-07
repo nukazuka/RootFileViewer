@@ -7,7 +7,7 @@ Drawer::Drawer( Argument* arg )
 
   arg_ = arg;
   Init();
-
+  
   c_->Print( (save_+"[").c_str() );
   DrawInfo();
 
@@ -33,8 +33,8 @@ void Drawer::Init()
   save_ = arg_->GetSaveName();
   arg_->GetVectorTree( vtr_ );
   arg_->GetVectorCut( vcut_ );
-
   GetName( vtr_, vbranch_name_ );
+
   //  ShowVC( vbranch_name_ );
 
   if( arg_->IsTest() )
@@ -117,7 +117,7 @@ void Drawer::Draw()
     carrige_return = "\n";
 
   for( int i=0; i<branch_num_; i++ )
-  //  for( int i=0; i<1; i++ )
+    //for( int i=0; i<1; i++ )
     {
 
       string bar = GetRepeatedWords( "=" , 2 * 10 * i / branch_num_ ) + ">";

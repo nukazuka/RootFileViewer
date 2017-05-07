@@ -21,7 +21,6 @@ void FileManager::Init()
   file_suffix_ = GetSuffix( file_name_ );
   structure_ = "";
 
-  cout << file_name_ << endl;
   tf_ = new TFile( file_full_path_.c_str(), "READ" );
   bl_exist_ = tf_->IsOpen();
   bl_same_tree_structure_ = false;
