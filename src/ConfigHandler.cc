@@ -80,7 +80,16 @@ void ConfigHandler::RegisterSetting( string tag, vector < string > vword  )
     vword.push_back( "NULL" );
   
   if( tag == "data" ) // vector
-    vdata_path_.push_back( vword[0] );
+    {
+
+      vdata_path_.push_back( vword[0] );
+
+      // if line color for this file is specified
+      if( vword.size() > 1 )
+	  vcolor_.push_back ( String2Int( vword[1] ) );
+      else
+	vcolor_.push_back ( -1 );
+    }
   else if( tag == "cut" ) // vector
     vcut_.push_back( vword[0] );
   else if( tag == "branch" ) // vector

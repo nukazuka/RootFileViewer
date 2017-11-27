@@ -94,6 +94,7 @@ class ConfigHandler
 private :
   
   string config_path_ = "";
+  vector < int > vcolor_;
   vector < string > vdata_path_;
   vector < string > vcut_;
   vector < string > vbranch_name_;
@@ -104,6 +105,7 @@ private :
   string tree_name_ = "";
   string mode_ = "";
   string draw_option_ = "";
+
   
   bool bl_norm_ = false;
   bool bl_logx_ = false;
@@ -128,14 +130,18 @@ public :
 
   vector < BranchConfig* > GetBranchConfig(){ return vbranch_config_;   };
   string GetConfigPath			(){ return  config_path_;	};
+
   vector < string > GetBranchName	(){ return vbranch_name_;       };
   vector < string > GetBranchExcept	(){ return vbranch_except_;     };
+  vector < int >    GetColor            (){ return vcolor_;             };
   vector < string > GetData		(){ return vdata_path_;		};
   vector < string > GetCuts		(){ return vcut_;		};
+
   string GetDrawOption			(){ return  draw_option_;	};
   string GetOutputPath			(){ return  output_path_;	};
   string GetTreeName			(){ return  tree_name_;		};
   string GetMode			(){ return  mode_;		};
+
   bool IsEachCut			(){ return  bl_each_cut_;       }; // not ready
   bool IsNorm				(){ return  bl_norm_;		};
   bool IsLogx				(){ return  bl_logx_;		};

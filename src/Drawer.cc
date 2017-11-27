@@ -54,6 +54,7 @@ void Drawer::Init()
     }
   else
     {
+      
       vbranch_name_ = arg_->GetConfigHandler()->GetBranchName();
       vbranch_config_ = arg_->GetConfigHandler()->GetBranchConfig();
     }
@@ -205,6 +206,7 @@ void Drawer::DrawPad( TVirtualPad* pad , vector < TH1D* >& vhist, string branch_
   mh->SetMarginRight( 0.15 );
   mh->SetDrawNoEntry( true );
   mh->SetStatsBoxPoint( 0.9 , 0.85 );
+  mh->SetStatsFormat( 1111 );
 
   if( ratio == false )
     {
@@ -334,6 +336,13 @@ vector < TH1D* > Drawer::GetVectorHist( BranchConfig* branch_config )
 				branch_config->xmax_
 				)
 		       );
+
+      int color =  config_->GetColor()[i];
+      if( color != -1 )
+	HistSetting( vhist[i] , GetColor( color ), 2, 20, 1, 62 );
+      else
+	HistSetting( vhist[i] , GetColor( i ), 2, 20, 1, 62 );
+	      
     }
   return vhist;
 }
