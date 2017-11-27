@@ -242,11 +242,14 @@ void Argument::ExtractTreeID()
   // the number is applied to all TTree
   if( IsNumber( specified_tree_name_ ) )
     {
+
       // get id
       int id = String2Int( specified_tree_name_ );
 
       // if id is valid, store it
       if( id > -1 && id < vfm_[0]->GetTreeNum() )
+
+	//	tree_id_ = id;
 	for( int i=0; i<vfile_.size(); i++ )
 	  vtree_id_.push_back( id );
 
@@ -256,6 +259,37 @@ void Argument::ExtractTreeID()
   // id number of the tree in each file is searched and stored
   else
     {
+  //     for( int i=0; i<vfm_[0]->GetTreeNum(); i++ )
+  //     	{	  
+
+  //     	  if( specified_tree_name_ == vfm_[0]->GetTree(i)->GetName() )
+  //     	    {
+  //     	      tree_id_ = i;
+  //     	    }
+  //     	}
+  //   }
+
+  
+  // /////////////////////////////////////////
+  // // vector version
+  // for( int i=0; i<vfile_.size(); i++ )
+  //   {
+
+  //     for( int j=0; j<vfm_[i]->GetTreeNum(); j++ )
+  // 	{
+
+  // 	  if( IsNumber( specified_tree_name_ ) )
+  // 	    {
+  // 	      int id = String2Int( specified_tree_name_ );
+  // 	      if( id > -1 && id < vfm_[0]->GetTreeNum() )
+  // 		vtree_id_.push_back( id );
+  // 	    }	  
+  // 	    else if( specified_tree_name_ == (string)(vfm_[i]->GetTree(j)->GetName()) )
+  // 	    {
+
+  // 	      vtree_id_.push_back(j);
+  // 	      break;
+
       for( int i=0; i<vfile_.size(); i++ )
 	{
 	  for( int j=0; j<vfm_[i]->GetTreeNum(); j++ )
@@ -276,8 +310,7 @@ void Argument::ExtractTreeID()
       cerr << " a number of tree id found is 0" << endl;
       cerr << " check whether tree name is correct or not" << endl;
       exit( -1 );
-    }
-  
+    }  
 }
 
 // output name is :
@@ -450,6 +483,7 @@ void Argument::ShowTreeInfo()
 
 vector < TTree* > Argument::GetVectorTree()
 {
+
   vector < TTree* > vtr;
   for( unsigned int i=0; i<vfm_.size(); i++ )
     vtr.push_back( vfm_[i]->GetTree( vtree_id_[i] ) );

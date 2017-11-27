@@ -8,7 +8,7 @@
 #include <iostream>
 #include <algorithm>
 
-#include "/home/gnukazuk/soft/MyLibrary/include/MyLibrary.hh"
+#include "MyLibrary.hh"
 #include "GetName.hh"
 
 using namespace std;
